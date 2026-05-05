@@ -1,0 +1,36 @@
+/* === БИБЛИОТЕКА ШАБЛОНОВ [DSN-001] === */
+.templates-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+.create-template-btn {
+  margin: 0 16px 16px;
+}
+
+.template-group-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.template-count-badge {
+  background-color: var(--bg-gray);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+}
+
+/* Свайп-действия [DSN-001] */
+.swipe-container {
+  overflow: hidden;
+  position: relative;
+}
+.swipe-action {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: flex;
+}
+.edit-action { background-color: var(--green-primary); color: #FFF; }
+.delete-action { background-color: var(--red-error); color: #FFF; }

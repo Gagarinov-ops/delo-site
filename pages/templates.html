@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Шаблоны смет</title>
+  <meta name="description" content="Библиотека шаблонов смет для ремонтных работ. Косметический и капитальный ремонт, сантехника.">
+  
+  <meta property="og:title" content="Шаблоны смет Дело.Сайт">
+  <meta property="og:description" content="Готовые шаблоны смет для ремонта.">
+  <meta property="og:type" content="website">
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/templates.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="templates-heading">
+    
+    <header style="padding: 16px;">
+      <h1 id="templates-heading" style="font-size: 20px; margin: 0;">Шаблоны</h1>
+      <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0;">
+        Готовые сметы для разных типов работ
+      </p>
+    </header>
+
+    <!-- Группы шаблонов -->
+    <section aria-labelledby="groups-heading" style="padding: 0 16px;">
+      <h2 id="groups-heading" style="display: none;">Группы шаблонов</h2>
+      
+      <ul style="list-style: none; padding: 0;">
+        
+        <!-- Косметический ремонт -->
+        <li class="card template-group-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть группу: Косметический ремонт, 5 шаблонов">
+          <article style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="font-size: 16px; margin: 0;">Косметический ремонт</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+                <span class="template-count-badge" style="background: var(--bg-gray); padding: 2px 8px; border-radius: 10px;">5 шаблонов</span>
+                <span style="margin-left: 8px;">от 45 000 ₽</span>
+              </p>
+            </div>
+            <span aria-hidden="true" style="font-size: 18px; color: var(--text-secondary);">→</span>
+          </article>
+        </li>
+
+        <!-- Капитальный ремонт -->
+        <li class="card template-group-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть группу: Капитальный ремонт, 8 шаблонов">
+          <article style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="font-size: 16px; margin: 0;">Капитальный ремонт</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+                <span class="template-count-badge" style="background: var(--bg-gray); padding: 2px 8px; border-radius: 10px;">8 шаблонов</span>
+                <span style="margin-left: 8px;">от 120 000 ₽</span>
+              </p>
+            </div>
+            <span aria-hidden="true" style="font-size: 18px; color: var(--text-secondary);">→</span>
+          </article>
+        </li>
+
+        <!-- Сантехнические работы -->
+        <li class="card template-group-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть группу: Сантехнические работы, 3 шаблона">
+          <article style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="font-size: 16px; margin: 0;">Сантехнические работы</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+                <span class="template-count-badge" style="background: var(--bg-gray); padding: 2px 8px; border-radius: 10px;">3 шаблона</span>
+                <span style="margin-left: 8px;">от 25 000 ₽</span>
+              </p>
+            </div>
+            <span aria-hidden="true" style="font-size: 18px; color: var(--text-secondary);">→</span>
+          </article>
+        </li>
+
+        <!-- Электромонтажные работы -->
+        <li class="card template-group-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть группу: Электромонтажные работы, 4 шаблона">
+          <article style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h3 style="font-size: 16px; margin: 0;">Электромонтажные работы</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 4px 0 0;">
+                <span class="template-count-badge" style="background: var(--bg-gray); padding: 2px 8px; border-radius: 10px;">4 шаблона</span>
+                <span style="margin-left: 8px;">от 30 000 ₽</span>
+              </p>
+            </div>
+            <span aria-hidden="true" style="font-size: 18px; color: var(--text-secondary);">→</span>
+          </article>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Кнопка создания своего шаблона -->
+    <footer style="padding: 16px;">
+      <button class="btn-primary create-template-btn" type="button"
+              aria-label="Создать свой шаблон сметы">
+        + Создать свой шаблон
+      </button>
+    </footer>
+  </main>
+
+  <script>
+    (function() {
+      document.querySelectorAll('.template-group-card').forEach(card => {
+        card.addEventListener('click', function() {
+          const name = this.querySelector('h3')?.textContent || '';
+          console.log('[Templates] Opening group:', name);
+        });
+        
+        card.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            this.click();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

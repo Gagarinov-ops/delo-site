@@ -1,0 +1,75 @@
+/* === РЕГИСТРАЦИЯ И ВХОД [DSN-001], [RISK-01], [RISK-02], [DISCLAIMER-001] === */
+.auth-container {
+  display: flex;
+  flex-direction: column;
+  padding: 32px 16px;
+}
+.app-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  text-align: center;
+}
+.auth-subtitle {
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 24px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+}
+.auth-form .input-field {
+  margin-bottom: 16px;
+}
+
+/* Чек-бокс с юридическим текстом [DISCLAIMER-001] */
+.legal-agreement {
+  margin: 8px 0 24px;
+}
+.legal-agreement .checkbox-legal {
+  margin: 0;
+}
+.legal-agreement .legal-note {
+  margin-top: 12px;
+}
+
+.auth-links {
+  text-align: center;
+  margin-top: 16px;
+  font-size: 14px;
+}
+.auth-links a {
+  color: var(--green-primary);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+/* Ошибка "Слишком много попыток" [RISK-02] */
+.error-timer {
+  color: var(--red-error);
+  font-weight: 600;
+  margin: 16px 0;
+  text-align: center;
+}
+.disabled-area {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Ошибка "Номер уже зарегистрирован" [RISK-01] */
+.error-message {
+  color: var(--red-error);
+  font-size: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.error-message .btn-link {
+  background: none;
+  border: none;
+  color: var(--green-primary);
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — План помещения</title>
+  <meta name="description" content="Конструктор плана помещения — создайте схему для расчёта сметы.">
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/plan.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="plan-heading">
+    
+    <header class="plan-header">
+      <nav aria-label="Навигация плана" style="display: flex; justify-content: space-between; width: 100%;">
+        <button type="button" aria-label="Вернуться на предыдущий экран">← Назад</button>
+        <h1 id="plan-heading" style="font-weight: 600; font-size: 16px; margin: 0;">Новый проект</h1>
+        <button type="button" id="plan-next-btn" disabled aria-disabled="true">Далее →</button>
+      </nav>
+    </header>
+
+    <aside class="disclaimer-box" role="alert" aria-labelledby="disclaimer-heading">
+      <h2 id="disclaimer-heading" style="display: none;">⚠️ Внимание</h2>
+      <p>Данный План помещения создан автоматически на основе введённых вами размеров. Расчёт носит рекомендательный характер. Вы как Подрядчик обязаны лично проверить все размеры, пропорции и объёмы перед использованием. Сервис не гарантирует точность автоматических построений и не несёт ответственности за ошибки. План помещения не является проектной или технической документацией.</p>
+    </aside>
+
+    <form class="dimensions-row" aria-label="Размеры помещения" novalidate>
+      <fieldset style="border: none; padding: 0; margin: 0; display: flex; gap: 12px;">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Габариты помещения в метрах</legend>
+        
+        <div class="dimension-field">
+          <label for="room-length">Длина (м)</label>
+          <input type="number" id="room-length" class="input-field" 
+                 placeholder="0.00" step="0.01" min="0.01"
+                 aria-describedby="length-error" inputmode="decimal">
+          <span id="length-error" class="validation-error-text" role="alert"></span>
+        </div>
+        
+        <div class="dimension-field">
+          <label for="room-width">Ширина (м)</label>
+          <input type="number" id="room-width" class="input-field" 
+                 placeholder="0.00" step="0.01" min="0.01"
+                 aria-describedby="width-error" inputmode="decimal">
+          <span id="width-error" class="validation-error-text" role="alert"></span>
+        </div>
+        
+        <div class="dimension-field">
+          <label for="room-height">Высота (м)</label>
+          <input type="number" id="room-height" class="input-field" 
+                 placeholder="0.00" step="0.01" min="0.01"
+                 aria-describedby="height-error" inputmode="decimal">
+          <span id="height-error" class="validation-error-text" role="alert"></span>
+        </div>
+      </fieldset>
+    </form>
+
+    <figure class="tetris-grid" id="tetris-container" 
+            role="img" aria-label="Интерактивный план помещения. Используйте инструменты ниже для редактирования.">
+      <figcaption style="position: absolute; width: 1px; height: 1px; overflow: hidden;">План помещения с сеткой</figcaption>
+    </figure>
+
+    <nav class="tools-panel" role="toolbar" aria-label="Инструменты редактирования плана"></nav>
+
+    <footer class="calculate-btn">
+      <button class="btn-primary" id="calculate-plan-btn" type="button" disabled aria-disabled="true">
+        Рассчитать и перейти к смете
+      </button>
+      <p id="contour-warning" style="color: var(--red-error); font-size: 12px; text-align: center; margin-top: 8px; display: none;" role="alert"></p>
+    </footer>
+  </main>
+
+  <!-- [AP-008] Только внешние скрипты -->
+  <script src="../js/pages/plan.js"></script>
+  <script type="module" src="../js/core/app.js"></script>
+</body>
+</html>

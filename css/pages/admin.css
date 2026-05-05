@@ -1,0 +1,49 @@
+/* === АДМИНКА CEO [ADM-001] === */
+.admin-container {
+  padding: 16px;
+}
+
+.admin-header {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 24px;
+}
+
+/* Список пользователей */
+.users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.users-table th,
+.users-table td {
+  text-align: left;
+  padding: 12px 8px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-gray);
+}
+.users-table th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.overdue-flag {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: var(--red-error);
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.btn-block {
+  background-color: var(--red-error);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}

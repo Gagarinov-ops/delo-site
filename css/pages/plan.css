@@ -1,0 +1,62 @@
+/* === ПЛАН ПОМЕЩЕНИЯ [PLN-001] + [PLN-001-UPD] === */
+.plan-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+}
+
+.dimensions-row {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 16px;
+}
+.dimension-field {
+  flex: 1;
+}
+.dimension-field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+.dimension-field input {
+  width: 100%;
+  height: var(--field-height);
+  text-align: center;
+  font-size: 16px;
+}
+
+.tetris-grid {
+  width: calc(100% - 32px);
+  height: 300px;
+  background-color: var(--bg-gray);
+  border: 1px dashed var(--border-gray);
+  margin: 0 16px 16px;
+  position: relative;
+  touch-action: manipulation;
+}
+
+/* Маркер угла [PLN-001-UPD] */
+.angle-marker {
+  display: flex;
+  gap: 12px;
+  padding: 0 16px 16px;
+  align-items: center;
+}
+.angle-marker .input-field {
+  flex: 1;
+  height: 40px;
+  font-size: 14px;
+}
+
+.validation-error-text {
+  color: var(--red-error);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.calculate-btn {
+  margin: 0 16px 16px;
+}

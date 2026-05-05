@@ -1,0 +1,24 @@
+/* === ТАРИФЫ И ОПЛАТА [DSN-001] === */
+.tariffs-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+}
+.tariff-option {
+  border: 2px solid var(--border-gray);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  text-align: center;
+}
+.tariff-option.recommended {
+  border-color: var(--green-primary);
+}
+.tariff-price {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 12px 0;
+}
+.tariff-select-btn {
+  margin-top: 12px;
+}

@@ -1,0 +1,62 @@
+/* === ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ И СБРОС СТИЛЕЙ [UI-001] === */
+:root {
+  /* Основные цвета [DSN-001] */
+  --green-primary: #00A651;
+  --green-hover: #008C42;
+  --text-primary: #2D2D2D;
+  --text-secondary: #999999;
+  --bg-white: #FFFFFF;
+  --bg-gray: #F5F5F5;
+  --border-gray: #E0E0E0;
+  --red-error: #D32F2F;
+  --yellow-bg: #FFF9E6;
+  --yellow-text: #7A6A00;
+
+  /* Скругления [DSN-001] */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-pill: 20px;
+
+  /* Типографика [UI-001] */
+  --font-family: 'InterVariable', -apple-system, sans-serif;
+  
+  /* Доступность [AP-001] */
+  --min-tap: 48px;
+  --field-height: 56px;
+  --filter-height: 40px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-weight: 400;
+  font-stretch: 100%;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  max-width: 375px;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+}
+
+body[data-theme="dark"] {
+  --bg-white: #1E1E1E;
+  --bg-gray: #2C2C2C;
+  --text-primary: #F5F5F5;
+  --text-secondary: #A0A0A0;
+  --border-gray: #404040;
+  --yellow-bg: #332D00;
+  --yellow-text: #D4C300;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
+}

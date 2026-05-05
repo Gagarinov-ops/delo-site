@@ -1,0 +1,362 @@
+/* === КОМПОНЕНТЫ [DSN-001], [RISK-03], [RISK-06], [RISK-07], [DISCLAIMER-001..003] === */
+
+/* Кнопка основная зелёная */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-tap);
+  height: var(--field-height);
+  padding: 0 24px;
+  background-color: var(--green-primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  width: 100%;
+}
+.btn-primary:active,
+.btn-primary:focus-visible {
+  background-color: var(--green-hover);
+  outline: none;
+}
+.btn-primary:disabled {
+  background-color: #BDBDBD;
+  color: #FFFFFF;
+  cursor: not-allowed;
+}
+
+/* Кнопка вторичная с зелёной рамкой */
+.btn-outline-green {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-tap);
+  height: 48px;
+  padding: 0 24px;
+  background-color: transparent;
+  color: var(--green-primary);
+  border: 1px solid var(--green-primary);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-outline-green:active {
+  background-color: rgba(0, 166, 81, 0.05);
+}
+
+/* Кнопка опасности вторичная */
+.btn-danger-secondary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-tap);
+  padding: 0 24px;
+  background-color: transparent;
+  color: var(--red-error);
+  border: 1px solid var(--red-error);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+/* Кнопка отмены */
+.btn-cancel {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--min-tap);
+  padding: 0 24px;
+  background-color: transparent;
+  color: var(--text-secondary);
+  border: none;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family);
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  width: 100%;
+}
+.btn-cancel:active {
+  background-color: var(--bg-gray);
+}
+
+/* Поле ввода */
+.input-field {
+  width: 100%;
+  height: var(--field-height);
+  padding: 0 16px;
+  font-family: var(--font-family);
+  font-size: 16px;
+  color: var(--text-primary);
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-sm);
+  transition: border-color 0.2s ease;
+}
+.input-field:focus {
+  border-color: var(--green-primary);
+  outline: none;
+}
+.input-field.error {
+  border-color: var(--red-error);
+}
+
+/* Карточка */
+.card {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.card-status-badge {
+  display: inline-block;
+  padding: 4px 8px;
+  background-color: rgba(0, 166, 81, 0.1);
+  color: var(--green-primary);
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 4px;
+}
+
+/* Модальное окно */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-window {
+  background-color: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  width: calc(100% - 48px);
+  max-width: 327px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.modal-title {
+  font-family: var(--font-family);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  text-align: center;
+}
+.modal-text {
+  font-family: var(--font-family);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+}
+.modal-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0;
+}
+.modal-list li {
+  position: relative;
+  padding-left: 16px;
+  margin-bottom: 8px;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.modal-list li::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: var(--text-primary);
+}
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Таб-бар */
+.tab-bar {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 375px;
+  height: 64px;
+  background-color: var(--bg-white);
+  border-top: 1px solid var(--border-gray);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 100;
+}
+.tab-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 10px;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.tab-item.active {
+  color: var(--green-primary);
+}
+
+/* Тост */
+.toast {
+  background-color: var(--yellow-bg);
+  color: var(--yellow-text);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+}
+
+/* Дисклеймер */
+.disclaimer-box {
+  background-color: var(--yellow-bg);
+  color: var(--yellow-text);
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  font-size: 12px;
+  line-height: 1.4;
+  margin: 0 16px 16px;
+}
+
+/* Чек-бокс юридический */
+.checkbox-legal {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+.checkbox-legal input[type="checkbox"] {
+  min-width: 24px;
+  height: 24px;
+  accent-color: var(--green-primary);
+  margin-top: 2px;
+}
+.checkbox-legal label {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+.checkbox-legal label a {
+  color: var(--green-primary);
+  text-decoration: underline;
+  font-weight: 500;
+}
+.legal-note {
+  font-size: 11px;
+  line-height: 1.4;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+/* Панель фильтров (пилюли) [DSN-001-UPD] */
+.filter-pills {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+}
+.filter-pill {
+  flex: 1;
+  height: var(--filter-height);
+  border-radius: var(--radius-pill);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background-color: var(--bg-gray);
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
+}
+.filter-pill.active {
+  background-color: var(--green-primary);
+  color: #FFFFFF;
+}
+
+/* Панель инструментов (24px иконки) */
+.tools-panel {
+  display: flex;
+  justify-content: space-around;
+  padding: 8px 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.tool-icon {
+  width: 24px;
+  height: 24px;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+.tools-section-title {
+  font-size: 11px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 8px 16px 4px;
+  width: 100%;
+}
+
+/* Двухколоночная компоновка [EST-001-UPD] */
+.two-column-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-height: 100vh;
+}
+.col-left {
+  border-right: 1px solid var(--border-gray);
+  padding-right: 12px;
+}
+.col-right {
+  padding-left: 12px;
+}
+
+/* Метрики (админка) */
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 16px;
+}
+.metric-card {
+  text-align: center;
+  background-color: var(--bg-gray);
+  border-radius: var(--radius-sm);
+  padding: 8px 4px;
+}
+.metric-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--green-primary);
+}
+.metric-label {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}

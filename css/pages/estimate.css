@@ -1,0 +1,64 @@
+/* === СМЕТА [EST-001-UPD] === */
+.estimate-container {
+  padding: 16px;
+}
+
+/* Двухколоночная компоновка */
+.estimate-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  min-height: calc(100vh - 32px);
+}
+.estimate-left {
+  border-right: 1px solid var(--border-gray);
+  padding-right: 12px;
+}
+.estimate-right {
+  padding-left: 12px;
+}
+
+.estimate-tree {
+  list-style: none;
+}
+.estimate-tree li {
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-gray);
+}
+.estimate-tree .room {
+  font-weight: 600;
+  color: var(--text-primary);
+}
+.estimate-tree .section {
+  padding-left: 12px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  text-transform: uppercase;
+}
+.estimate-tree .work {
+  padding-left: 24px;
+  font-size: 14px;
+}
+
+.estimate-summary {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.estimate-coefficient {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+.estimate-coefficient span {
+  color: var(--green-primary);
+  font-weight: 600;
+}
+
+.estimate-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

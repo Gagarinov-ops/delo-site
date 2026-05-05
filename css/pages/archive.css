@@ -1,0 +1,24 @@
+/* === АРХИВ [DSN-001] === */
+.archive-project-card {
+  /* Как .card, но без бейджа "В работе" */
+}
+
+.passport-section {
+  padding: 16px;
+}
+.passport-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 16px;
+}
+.passport-thumb {
+  aspect-ratio: 1 / 1;
+  background-color: var(--bg-gray);
+  border-radius: 4px;
+}
+.passport-upsell {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-secondary);
+}

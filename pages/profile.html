@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Профиль</title>
+  <meta name="description" content="Настройки профиля, уведомления и поддержка сервиса Дело.Сайт.">
+  
+  <meta property="og:title" content="Профиль Дело.Сайт">
+  <meta property="og:description" content="Настройки профиля и уведомлений.">
+  <meta property="og:type" content="website">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Профиль Дело.Сайт",
+    "description": "Настройки профиля пользователя."
+  }
+  </script>
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/profile.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="profile-heading">
+    
+    <header style="padding: 16px;">
+      <h1 id="profile-heading" style="font-size: 20px; margin: 0;">Профиль</h1>
+    </header>
+
+    <form class="profile-form" aria-label="Редактирование данных профиля" novalidate>
+      <fieldset style="border: none; padding: 0; margin: 0;">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Личные данные</legend>
+        
+        <label for="profile-name">Имя</label>
+        <input type="text" id="profile-name" name="name" class="input-field" 
+               autocomplete="name" aria-describedby="name-error" aria-required="true">
+        <span id="name-error" role="alert" style="display: none; color: var(--red-error); font-size: 12px;"></span>
+        
+        <label for="profile-phone">Телефон</label>
+        <input type="tel" id="profile-phone" name="phone" class="input-field" 
+               autocomplete="tel" placeholder="+7XXXXXXXXXX"
+               aria-describedby="phone-error" aria-required="true">
+        <span id="phone-error" role="alert" style="display: none; color: var(--red-error); font-size: 12px;"></span>
+        
+        <label for="profile-email">Email</label>
+        <input type="email" id="profile-email" name="email" class="input-field" 
+               autocomplete="email" aria-describedby="email-error" aria-required="true">
+        <span id="email-error" role="alert" style="display: none; color: var(--red-error); font-size: 12px;"></span>
+        
+        <label for="profile-status">Статус</label>
+        <select id="profile-status" name="status" class="input-field" aria-required="true">
+          <option value="Физлицо">Физическое лицо</option>
+          <option value="Самозанятый">Самозанятый</option>
+          <option value="ИП">Индивидуальный предприниматель</option>
+        </select>
+      </fieldset>
+    </form>
+
+    <section aria-labelledby="support-heading" style="padding: 16px;">
+      <h2 id="support-heading" style="font-size: 16px; margin: 0 0 12px 0;">Поддержка</h2>
+      <ul style="list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px;">
+        <li>
+          <button type="button" class="support-btn" aria-label="Написать в основную поддержку MAX">
+            <svg width="24" height="24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="var(--green-primary)"/></svg>
+            MAX (основной)
+          </button>
+        </li>
+        <li>
+          <button type="button" class="support-btn" aria-label="Написать в Telegram-поддержку">
+            <svg width="24" height="24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="#0088cc"/></svg>
+            Telegram
+          </button>
+        </li>
+        <li>
+          <button type="button" class="support-btn" aria-label="Написать на Email поддержки">
+            <svg width="24" height="24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10" fill="var(--text-secondary)"/></svg>
+            Email
+          </button>
+        </li>
+      </ul>
+    </section>
+
+    <section aria-labelledby="notifications-heading" style="padding: 16px;">
+      <h2 id="notifications-heading" style="font-size: 16px; margin: 0 0 16px;">Уведомления</h2>
+      
+      <fieldset style="border: none; padding: 0; margin: 0;">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Настройки уведомлений</legend>
+        
+        <label style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-gray); cursor: pointer;">
+          <div>
+            <span style="font-size: 15px; display: block;">Push-уведомления</span>
+            <span style="font-size: 12px; color: var(--text-secondary); display: block; margin-top: 2px;">Мгновенные уведомления в браузере</span>
+          </div>
+          <input type="checkbox" id="notify-push" checked 
+                 role="switch" aria-checked="true"
+                 aria-label="Push-уведомления">
+        </label>
+        
+        <label style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--border-gray); cursor: pointer;">
+          <div>
+            <span style="font-size: 15px; display: block;">Email-уведомления</span>
+            <span style="font-size: 12px; color: var(--text-secondary); display: block; margin-top: 2px;">Важные обновления и напоминания</span>
+          </div>
+          <input type="checkbox" id="notify-email" checked 
+                 role="switch" aria-checked="true"
+                 aria-label="Email-уведомления">
+        </label>
+        
+        <label style="display: flex; justify-content: space-between; align-items: center; padding: 14px 0; cursor: pointer;">
+          <div>
+            <span style="font-size: 15px; display: block;">SMS-уведомления</span>
+            <span style="font-size: 12px; color: var(--text-secondary); display: block; margin-top: 2px;">Срочные уведомления на телефон</span>
+          </div>
+          <input type="checkbox" id="notify-sms" 
+                 role="switch" aria-checked="false"
+                 aria-label="SMS-уведомления">
+        </label>
+      </fieldset>
+    </section>
+
+    <section class="theme-switcher" aria-labelledby="theme-heading" style="padding: 16px;">
+      <h2 id="theme-heading" style="display: none;">Настройки отображения</h2>
+      <label for="theme-toggle" style="display: flex; justify-content: space-between; align-items: center; width: 100%; cursor: pointer;">
+        <span>Тёмная тема</span>
+        <input type="checkbox" id="theme-toggle" role="switch" aria-checked="false" aria-label="Переключить тёмную тему">
+      </label>
+    </section>
+
+    <footer style="padding: 16px;">
+      <button type="button" class="btn-danger-secondary" aria-label="Выйти из аккаунта">
+        Выйти
+      </button>
+    </footer>
+  </main>
+
+  <!-- [AP-008] Только внешние скрипты -->
+  <script src="../js/pages/profile.js"></script>
+</body>
+</html>

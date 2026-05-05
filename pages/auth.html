@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Регистрация / Вход</title>
+  <meta name="description" content="Регистрация и вход в сервис Дело.Сайт для мастеров-ремонтников.">
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/auth.css">
+</head>
+<body>
+  <main role="main" class="auth-container" aria-labelledby="auth-heading">
+    
+    <header>
+      <h1 class="app-title" id="auth-heading">Дело.Сайт</h1>
+      <p class="auth-subtitle" id="auth-mode-title">Регистрация</p>
+    </header>
+
+    <form class="auth-form" aria-labelledby="auth-mode-title" novalidate>
+      <fieldset style="border: none; padding: 0; margin: 0;">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Данные для регистрации</legend>
+        
+        <label for="auth-name">Имя</label>
+        <input type="text" id="auth-name" name="name" class="input-field" 
+               autocomplete="name" aria-describedby="name-auth-error" aria-required="true">
+        <span id="name-auth-error" role="alert" style="display: none; color: var(--red-error); font-size: 12px;"></span>
+        
+        <label for="auth-phone">Телефон</label>
+        <input type="tel" id="auth-phone" name="phone" class="input-field" 
+               autocomplete="tel" placeholder="+7XXXXXXXXXX"
+               aria-describedby="phone-auth-error" aria-required="true">
+        <div id="phone-auth-error" role="alert" style="color: var(--red-error); font-size: 14px; display: none;" aria-live="polite"></div>
+        
+        <label for="auth-password">Пароль</label>
+        <input type="password" id="auth-password" name="password" class="input-field" 
+               autocomplete="new-password" aria-describedby="password-auth-error" aria-required="true">
+        <span id="password-auth-error" role="alert" style="display: none; color: var(--red-error); font-size: 12px;"></span>
+      </fieldset>
+
+      <fieldset class="legal-agreement" style="border: none; padding: 0; margin: 8px 0 24px;">
+        <legend style="position: absolute; width: 1px; height: 1px; overflow: hidden;">Юридическое согласие</legend>
+        
+        <div class="checkbox-legal">
+          <input type="checkbox" id="legalConsent" name="legalConsent" required 
+                 aria-describedby="legal-note-text">
+          <label for="legalConsent">
+            Я принимаю условия <a href="/pages/offer.html">Договора-оферты</a>, 
+            <a href="/pages/privacy.html">Политики конфиденциальности</a> и ознакомлен с 
+            <a href="/pages/tariffs.html">Тарифами</a>.
+          </label>
+        </div>
+        <p id="legal-note-text" class="legal-note">
+          Отмечая этот пункт, я понимаю, что это является моей простой электронной подписью, равнозначной собственноручной подписи на бумаге. Я подтверждаю, что «Дело.Сайт» — это инструмент для расчётов и документов, не являющийся подрядчиком. Я обязан лично проверить все созданные сметы и договоры перед их использованием с Заказчиком.
+        </p>
+      </fieldset>
+
+      <p class="error-timer" id="block-timer" style="display: none;" role="alert" aria-live="assertive"></p>
+
+      <button type="submit" class="btn-primary" id="auth-submit-btn">
+        Зарегистрироваться
+      </button>
+
+      <p class="auth-links">
+        Уже есть аккаунт? <a href="#" id="switch-to-login" role="button">Войти</a>
+      </p>
+    </form>
+  </main>
+
+  <!-- [AP-008] Только внешние скрипты -->
+  <script src="../js/pages/auth.js"></script>
+</body>
+</html>

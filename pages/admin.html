@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Админ-панель</title>
+  <meta name="description" content="Административная панель управления сервисом Дело.Сайт. Метрики, пользователи, блокировки.">
+  <meta name="robots" content="noindex, nofollow">
+  
+  <meta property="og:title" content="Админ-панель Дело.Сайт">
+  <meta property="og:description" content="Управление пользователями и проектами.">
+  <meta property="og:type" content="website">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Админ-панель Дело.Сайт",
+    "description": "Административная панель управления сервисом."
+  }
+  </script>
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/admin.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="admin-heading" style="padding: 16px; max-width: 800px; margin: 0 auto;">
+    
+    <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+      <h1 id="admin-heading" style="font-size: 22px; margin: 0;">Админ-панель</h1>
+      <nav aria-label="Навигация админки">
+        <button type="button" 
+                style="background: none; border: 1px solid var(--border-gray); border-radius: 8px; padding: 8px 16px; font-size: 14px; cursor: pointer; color: var(--text-secondary);"
+                onclick="window.location.href='/pages/index.html'"
+                aria-label="Вернуться на главный экран">
+          ← На главную
+        </button>
+      </nav>
+    </header>
+
+    <section aria-labelledby="metrics-heading" style="margin-bottom: 32px;">
+      <h2 id="metrics-heading" style="font-size: 18px; margin: 0 0 16px;">Ключевые метрики</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+        
+        <article style="background: var(--bg-gray); border-radius: var(--radius-md); padding: 20px 16px; text-align: center;">
+          <p style="font-size: 32px; font-weight: 700; margin: 0; color: var(--green-primary);" id="metric-users">0</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0 0;">Пользователей</p>
+        </article>
+
+        <article style="background: var(--bg-gray); border-radius: var(--radius-md); padding: 20px 16px; text-align: center;">
+          <p style="font-size: 32px; font-weight: 700; margin: 0; color: var(--green-primary);" id="metric-projects">0</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0 0;">Проектов</p>
+        </article>
+
+        <article style="background: var(--bg-gray); border-radius: var(--radius-md); padding: 20px 16px; text-align: center;">
+          <p style="font-size: 32px; font-weight: 700; margin: 0; color: var(--green-primary);" id="metric-conversion">0%</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0 0;">Конверсия в оплату</p>
+        </article>
+
+        <article style="background: var(--bg-gray); border-radius: var(--radius-md); padding: 20px 16px; text-align: center;">
+          <p style="font-size: 32px; font-weight: 700; margin: 0; color: var(--green-primary);" id="metric-active-today">0</p>
+          <p style="font-size: 13px; color: var(--text-secondary); margin: 6px 0 0;">Активных сегодня</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="users-heading">
+      <h2 id="users-heading" style="font-size: 18px; margin: 0 0 16px;">Пользователи</h2>
+      
+      <div style="overflow-x: auto;">
+        <table style="width: 100%; border-collapse: collapse;" aria-label="Список зарегистрированных пользователей">
+          <thead>
+            <tr style="text-align: left; border-bottom: 2px solid var(--border-gray);">
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Телефон</th>
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Тариф</th>
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Дата рег.</th>
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Пробный</th>
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Проектов</th>
+              <th scope="col" style="padding: 10px 8px; font-size: 12px; font-weight: 600; white-space: nowrap;">Действие</th>
+            </tr>
+          </thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+      </div>
+
+      <p id="users-empty" style="text-align: center; padding: 32px; color: var(--text-secondary); display: none;">
+        Нет зарегистрированных пользователей
+      </p>
+    </section>
+  </main>
+
+  <!-- [AP-008] Только внешние скрипты -->
+  <script src="../js/pages/admin.js"></script>
+</body>
+</html>

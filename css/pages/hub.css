@@ -1,0 +1,51 @@
+/* === ХАБ ДОКУМЕНТОВ [DSN-001] + [DISCLAIMER-003] === */
+.hub-header {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+.address-title {
+  flex: 1;
+  text-align: center;
+  font-weight: 500;
+}
+
+.contract-summary-card {
+  background-color: var(--bg-gray);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin: 16px;
+}
+
+.doc-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.doc-icon {
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+}
+
+/* Адаптация тоста [RISK-06] */
+.hub-toast {
+  margin: 0 16px 16px;
+}
+
+/* Кнопка закрытия проекта [RISK-07] */
+.close-project-btn {
+  margin: 16px;
+}
+
+/* Модальное окно подтверждения PDF [DISCLAIMER-003] */
+.disclaimer-modal .modal-window {
+  max-width: 343px;
+}
+.disclaimer-modal .modal-title {
+  font-size: 16px;
+  letter-spacing: 0.5px;
+}
+.disclaimer-modal .btn-primary {
+  margin-bottom: 0;
+}

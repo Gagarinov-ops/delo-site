@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Хаб документов</title>
+  <meta name="description" content="Управление договорами, актами и документами проекта.">
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/hub.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="hub-heading">
+    <header class="hub-header">
+      <nav aria-label="Навигация хаба" style="display: flex; align-items: center; width: 100%;">
+        <button type="button" aria-label="Вернуться назад" style="background: none; border: none; cursor: pointer;">←</button>
+        <h1 id="hub-heading" class="address-title" style="font-size: 16px; margin: 0;">Адрес объекта</h1>
+        <span style="width: 24px;" aria-hidden="true"></span>
+      </nav>
+    </header>
+
+    <section class="contract-summary-card" aria-labelledby="summary-heading">
+      <h2 id="summary-heading" style="display: none;">Сводка по проекту</h2>
+      <dl>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <dt>Статус:</dt>
+          <dd><span class="card-status-badge" id="hub-status">В работе</span></dd>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <dt>Сумма договора:</dt>
+          <dd><strong id="hub-amount">0 ₽</strong></dd>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <dt>Окончание:</dt>
+          <dd><time datetime="" id="hub-deadline">—</time></dd>
+        </div>
+      </dl>
+    </section>
+
+    <section aria-labelledby="docs-heading" style="padding: 0 16px;">
+      <h2 id="docs-heading" style="display: none;">Документы проекта</h2>
+      <ul style="list-style: none; padding: 0;">
+        <li class="card" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <article style="display: flex; align-items: center; gap: 12px;">
+            <span aria-hidden="true" style="font-size: 24px;">📝</span>
+            <div>
+              <h3 style="font-weight: 500; font-size: 16px; margin: 0;">Договор подряда</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Основной документ</p>
+            </div>
+          </article>
+          <button class="btn-primary" type="button" style="width: auto; padding: 8px 16px; font-size: 14px;"
+                  aria-label="Создать Договор подряда">Создать</button>
+        </li>
+
+        <li class="card" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <article style="display: flex; align-items: center; gap: 12px;">
+            <span aria-hidden="true" style="font-size: 24px;">📎</span>
+            <div>
+              <h3 style="font-weight: 500; font-size: 16px; margin: 0;">Доп. соглашения</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0;" id="add-agreements-count">0 документов</p>
+            </div>
+          </article>
+          <button class="btn-primary" type="button" style="width: auto; padding: 8px 16px; font-size: 14px;"
+                  aria-label="Создать Дополнительное соглашение">Создать</button>
+        </li>
+
+        <li class="card" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <article style="display: flex; align-items: center; gap: 12px;">
+            <span aria-hidden="true" style="font-size: 24px;">🔒</span>
+            <div>
+              <h3 style="font-weight: 500; font-size: 16px; margin: 0;">Акт скрытых работ</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Приложение к договору</p>
+            </div>
+          </article>
+          <button class="btn-primary" type="button" style="width: auto; padding: 8px 16px; font-size: 14px;"
+                  aria-label="Скачать Акт скрытых работ">Скачать</button>
+        </li>
+
+        <li class="card" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+          <article style="display: flex; align-items: center; gap: 12px;">
+            <span aria-hidden="true" style="font-size: 24px;">✅</span>
+            <div>
+              <h3 style="font-weight: 500; font-size: 16px; margin: 0;">Акт выполненных работ</h3>
+              <p style="font-size: 12px; color: var(--text-secondary); margin: 0;">Итоговый документ</p>
+            </div>
+          </article>
+          <button class="btn-primary" type="button" style="width: auto; padding: 8px 16px; font-size: 14px;"
+                  aria-label="Скачать Акт выполненных работ">Скачать</button>
+        </li>
+      </ul>
+    </section>
+
+    <footer class="close-project-btn">
+      <button class="btn-danger-secondary" type="button" id="close-project-btn"
+              aria-label="Закрыть проект. Внимание: опасное действие">Закрыть проект</button>
+    </footer>
+  </main>
+
+  <!-- Модальное окно подтверждения PDF [DISCLAIMER-003] -->
+  <aside class="modal-overlay" id="pdfConfirmModal" style="display: none;" 
+         role="dialog" aria-modal="true" aria-labelledby="disclaimer-title" hidden>
+    <section class="modal-window">
+      <h2 id="disclaimer-title" class="modal-title">ПОДТВЕРЖДЕНИЕ ОТВЕТСТВЕННОСТИ</h2>
+      <div class="modal-text">
+        <p>Вы приступаете к созданию документов для Заказчика. Сервис «Дело.Сайт» является инструментом автоматизации и не гарантирует безошибочность расчётов.</p>
+        <p>Нажимая «Подтверждаю», вы заявляете, что:</p>
+        <ul class="modal-list">
+          <li>лично проверили все цифры, объёмы, сметы и тексты в создаваемом документе;</li>
+          <li>внесли все необходимые корректировки;</li>
+          <li>принимаете на себя полную ответственность перед Заказчиком за содержание данного документа.</li>
+        </ul>
+        <p>Сервис фиксирует факт и время этого подтверждения как вашу простую электронную подпись.</p>
+      </div>
+      <footer class="modal-actions">
+        <button class="btn-primary" type="button">Подтверждаю и продолжаю</button>
+        <button class="btn-cancel" type="button">Отмена</button>
+      </footer>
+    </section>
+  </aside>
+
+  <!-- Модальное окно закрытия проекта [RISK-07] -->
+  <aside class="modal-overlay" id="closeProjectModal" style="display: none;" 
+         role="dialog" aria-modal="true" aria-labelledby="close-title" hidden>
+    <section class="modal-window">
+      <h2 id="close-title" class="modal-title">Закрыть проект?</h2>
+      <p class="modal-text">Вы уверены, что хотите закрыть проект? После закрытия он переместится в Архив. Это действие нельзя отменить.</p>
+      <footer class="modal-actions">
+        <button class="btn-danger-secondary" type="button">Да, закрыть</button>
+        <button class="btn-cancel" type="button">Отмена</button>
+      </footer>
+    </section>
+  </aside>
+
+  <script type="module" src="../js/core/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+/* === ПРОФИЛЬ [PRF-001] + [PRF-001-UPD] === */
+.profile-form {
+  padding: 16px;
+}
+.profile-form .input-field,
+.profile-form select {
+  margin-bottom: 16px;
+}
+
+.support-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 24px 0;
+}
+.support-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border: 1px solid var(--border-gray);
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--text-primary);
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.theme-switcher {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  margin: 24px 0;
+  border-top: 1px solid var(--border-gray);
+  border-bottom: 1px solid var(--border-gray);
+}
+
+/* Настройки уведомлений [PRF-001-UPD] */
+.notifications-section {
+  margin: 24px 0;
+}
+.notifications-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border-gray);
+}
+.notification-item label {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.notification-item input[type="checkbox"] {
+  width: 48px;
+  height: 28px;
+  accent-color: var(--green-primary);
+}

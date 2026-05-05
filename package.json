@@ -1,0 +1,16 @@
+{
+  "name": "delo-site-mvp",
+  "version": "1.0.0",
+  "description": "MVP мобильного веб-приложения «Дело.Сайт» для мастеров-ремонтников",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx serve . -p 3000 --no-clipboard"
+  },
+  "keywords": ["ремонт", "смета", "план помещения", "договор подряда"],
+  "author": "Дело.Сайт",
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "serve": "^14.0.0"
+  }
+}

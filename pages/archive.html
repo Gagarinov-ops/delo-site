@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Архив проектов</title>
+  <meta name="description" content="Архив завершённых проектов сервиса Дело.Сайт.">
+  
+  <meta property="og:title" content="Архив проектов Дело.Сайт">
+  <meta property="og:description" content="Завершённые проекты ремонта.">
+  <meta property="og:type" content="website">
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Архив проектов Дело.Сайт",
+    "description": "Архив завершённых проектов."
+  }
+  </script>
+  
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/archive.css">
+</head>
+<body>
+  <main role="main" aria-labelledby="archive-heading">
+    
+    <header style="padding: 16px;">
+      <h1 id="archive-heading" style="font-size: 20px; margin: 0;">Архив</h1>
+      <p style="font-size: 14px; color: var(--text-secondary); margin: 4px 0 0;">Завершённые проекты</p>
+    </header>
+
+    <!-- Список завершённых проектов -->
+    <section aria-labelledby="completed-heading" style="padding: 0 16px;">
+      <h2 id="completed-heading" style="display: none;">Завершённые проекты</h2>
+      
+      <ul id="archive-list" aria-label="Список завершённых проектов" style="list-style: none; padding: 0;">
+        <!-- Пример проекта -->
+        <li class="card archive-project-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть проект: ул. Ленина, д. 15, кв. 42">
+          <article>
+            <h3 style="font-size: 16px; margin: 0 0 8px;">ул. Ленина, д. 15, кв. 42</h3>
+            <dl style="margin: 0; font-size: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+              <div>
+                <dt style="font-size: 12px; color: var(--text-secondary);">Завершён:</dt>
+                <dd><time datetime="2025-12-20">20 декабря 2025</time></dd>
+              </div>
+              <div>
+                <dt style="font-size: 12px; color: var(--text-secondary);">Сумма:</dt>
+                <dd style="font-weight: 600;">245 000 ₽</dd>
+              </div>
+            </dl>
+          </article>
+        </li>
+
+        <li class="card archive-project-card" style="margin-bottom: 12px; cursor: pointer;" tabindex="0"
+            role="button" aria-label="Открыть проект: ул. Мира, д. 8, кв. 105">
+          <article>
+            <h3 style="font-size: 16px; margin: 0 0 8px;">ул. Мира, д. 8, кв. 105</h3>
+            <dl style="margin: 0; font-size: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+              <div>
+                <dt style="font-size: 12px; color: var(--text-secondary);">Завершён:</dt>
+                <dd><time datetime="2025-11-05">05 ноября 2025</time></dd>
+              </div>
+              <div>
+                <dt style="font-size: 12px; color: var(--text-secondary);">Сумма:</dt>
+                <dd style="font-weight: 600;">180 000 ₽</dd>
+              </div>
+            </dl>
+          </article>
+        </li>
+      </ul>
+
+      <!-- Пустое состояние -->
+      <p id="archive-empty" style="text-align: center; padding: 32px; color: var(--text-secondary); display: none;">
+        Нет завершённых проектов
+      </p>
+    </section>
+
+    <!-- Паспорт объекта [RISK-08] -->
+    <section class="passport-section" aria-labelledby="passport-heading" style="padding: 16px;">
+      <h2 id="passport-heading" style="font-size: 18px; margin: 0 0 12px;">Паспорт объекта</h2>
+      
+      <!-- Заглушка для тарифа Старт и Мастер [RISK-08] -->
+      <div id="passport-upsell" style="text-align: center; padding: 24px; background: var(--bg-gray); border-radius: var(--radius-md);">
+        <p style="font-size: 16px; margin: 0 0 8px;">🔒</p>
+        <p style="font-size: 14px; color: var(--text-secondary); margin: 0;">
+          Функция «Паспорт объекта» доступна на тарифе «Прораб»
+        </p>
+        <a href="#tariffs" style="display: inline-block; margin-top: 12px; color: var(--green-primary); font-weight: 500;">
+          Сменить тариф →
+        </a>
+      </div>
+
+      <!-- Сетка превью для Прораба (скрыта по умолчанию) -->
+      <div id="passport-grid" style="display: none;">
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 16px;">
+          <figure class="passport-thumb" style="aspect-ratio: 1/1; background: var(--bg-gray); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <figcaption style="font-size: 12px; color: var(--text-secondary);">План</figcaption>
+          </figure>
+          <figure class="passport-thumb" style="aspect-ratio: 1/1; background: var(--bg-gray); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <figcaption style="font-size: 12px; color: var(--text-secondary);">Фото 1</figcaption>
+          </figure>
+          <figure class="passport-thumb" style="aspect-ratio: 1/1; background: var(--bg-gray); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+            <figcaption style="font-size: 12px; color: var(--text-secondary);">Фото 2</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    // Загрузка проектов из store
+    (function() {
+      const archiveList = document.getElementById('archive-list');
+      const emptyState = document.getElementById('archive-empty');
+
+      function loadArchive() {
+        try {
+          const state = window.App?.store?.getState();
+          const archived = state?.projects?.archived || [];
+
+          if (archived.length === 0 && archiveList) {
+            // Оставляем примеры, но показываем пустое состояние
+            if (emptyState) emptyState.style.display = 'block';
+          }
+        } catch (e) {
+          console.warn('[Archive] Failed to load projects');
+        }
+      }
+
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', loadArchive);
+      } else {
+        loadArchive();
+      }
+    })();
+  </script>
+</body>
+</html>
