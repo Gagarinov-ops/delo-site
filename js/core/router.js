@@ -4,12 +4,18 @@ import { events } from './events.js';
 class Router {
   constructor() {
     this.routes = {
-      home: 'pages/index.html', plan: 'pages/plan.html', hub: 'pages/hub.html',
-      profile: 'pages/profile.html', tariffs: 'pages/tariffs.html',
-      templates: 'pages/templates.html', archive: 'pages/archive.html',
-      auth: 'pages/auth.html', offer: 'pages/offer.html',
-      privacy: 'pages/privacy.html', landing: 'pages/landing.html',
-      admin: 'pages/admin.html',
+      home: BASE_PATH + '/pages/index.html',
+      auth: BASE_PATH + '/pages/auth.html',
+      plan: BASE_PATH + '/pages/plan.html',
+      hub: BASE_PATH + '/pages/hub.html',
+      profile: BASE_PATH + '/pages/profile.html',
+      tariffs: BASE_PATH + '/pages/tariffs.html',
+      templates: BASE_PATH + '/pages/templates.html',
+      archive: BASE_PATH + '/pages/archive.html',
+      admin: BASE_PATH + '/pages/admin.html',
+      landing: BASE_PATH + '/pages/landing.html',
+      offer: BASE_PATH + '/pages/offer.html',
+      privacy: BASE_PATH + '/pages/privacy.html',
     };
     this.currentRoute = null;
     this.container = document.getElementById('app-content');
