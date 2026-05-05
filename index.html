@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Проекты</title>
+  <meta name="description" content="Главный экран сервиса Дело.Сайт — управление проектами ремонта.">
+  
+  <meta property="og:title" content="Дело.Сайт — Проекты">
+  <meta property="og:description" content="Управление проектами ремонта.">
+  <meta property="og:type" content="website">
+  
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/home.css">
+</head>
+<body>
+  <div id="app-content">
+    <main class="home-container" role="main" aria-labelledby="greeting-heading">
+      
+      <header>
+        <h1 id="greeting-heading" class="greeting">Добрый день, <span id="user-name">Мастер</span>!</h1>
+        <p class="date-subtitle"><time datetime="" id="current-date">01 января 2026</time></p>
+      </header>
+
+      <section class="tariff-card" aria-labelledby="tariff-heading">
+        <h2 id="tariff-heading" style="display: none;">Текущий тариф</h2>
+        <dl>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <dt style="font-weight: 600;" id="tariff-name">Старт</dt>
+              <dd style="font-size: 12px; color: var(--text-secondary); margin: 0;" id="tariff-days">Осталось 14 дней</dd>
+            </div>
+            <dd style="margin: 0;">
+              <a href="#tariffs" class="tariff-link" aria-label="Перейти к выбору тарифа">Сменить тариф</a>
+            </dd>
+          </div>
+        </dl>
+      </section>
+
+      <section aria-labelledby="projects-heading">
+        <header class="projects-header">
+          <h2 id="projects-heading">Активные проекты</h2>
+          <span class="projects-counter" id="projects-counter" aria-live="polite">0 из 3</span>
+        </header>
+
+        <nav class="filter-panel" aria-label="Фильтры проектов" style="display: flex; gap: 8px; margin: 16px 0;">
+          <button class="filter-btn active" data-filter="active" type="button"
+                  style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-gray); border-radius: 20px; background: var(--green-primary); color: #fff; font-size: 14px; cursor: pointer; font-family: var(--font-family);">
+            Активные
+          </button>
+          <button class="filter-btn" data-filter="overdue" type="button"
+                  style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-gray); border-radius: 20px; background: transparent; color: var(--text-primary); font-size: 14px; cursor: pointer; font-family: var(--font-family);">
+            Просроченные
+          </button>
+          <button class="filter-btn" data-filter="archive" type="button"
+                  style="flex: 1; padding: 8px 12px; border: 1px solid var(--border-gray); border-radius: 20px; background: transparent; color: var(--text-primary); font-size: 14px; cursor: pointer; font-family: var(--font-family);">
+            Архив
+          </button>
+        </nav>
+
+        <ul id="projects-list" aria-label="Список активных проектов" style="list-style: none; padding: 0;"></ul>
+
+        <p class="empty-state" id="empty-state" role="status">
+          Нет активных проектов.<br>
+          <small>Нажмите «+ Новый проект», чтобы начать</small>
+        </p>
+      </section>
+
+      <footer class="create-project-btn">
+        <button class="btn-primary" id="new-project-btn" type="button"
+                aria-label="Создать новый проект">
+          + Новый проект
+        </button>
+
+        <button class="btn-secondary" id="quick-measure-btn" type="button"
+                aria-label="Быстрый замер помещения без регистрации"
+                style="margin-top: 12px;">
+          Быстрый замер
+        </button>
+      </footer>
+    </main>
+  </div>
+
+  <nav class="tab-bar" aria-label="Основная навигация">
+    <ul style="display: flex; justify-content: space-around; width: 100%; list-style: none; padding: 0; margin: 0;">
+      <li>
+        <a href="#home" class="tab-item active" aria-current="page">
+          <span aria-hidden="true">📋</span> Проекты
+        </a>
+      </li>
+      <li>
+        <a href="#archive" class="tab-item">
+          <span aria-hidden="true">📁</span> Архив
+        </a>
+      </li>
+      <li>
+        <a href="#templates" class="tab-item">
+          <span aria-hidden="true">📄</span> Шаблоны
+        </a>
+      </li>
+      <li>
+        <a href="#profile" class="tab-item">
+          <span aria-hidden="true">⚙️</span> Ещё
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <style>
+    .btn-secondary {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 0 24px;
+      background-color: transparent;
+      color: var(--green-primary);
+      border: 1px solid var(--green-primary);
+      border-radius: var(--radius-md);
+      font-family: var(--font-family);
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+    .btn-secondary:active {
+      background-color: rgba(0, 166, 81, 0.1);
+    }
+  </style>
+
+  <!-- [AP-008] Только внешние скрипты -->
+  <script src="js/pages/home.js"></script>
+  <script type="module" src="js/core/app.js"></script>
+</body>
+</html>
