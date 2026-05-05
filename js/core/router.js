@@ -21,7 +21,7 @@ class Router {
     if (!this.routes[route] || (this.currentRoute === route && pushState)) return;
     console.log(`[Router] Navigating to: ${route}`);
     events.emit('routeChanging', { from: this.currentRoute, to: route });
-    fetch(this.routes[route])
+    fetch('pages/' + route + '.html')
       .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.text(); })
       .then(html => {
         if (this.container) { this.container.innerHTML = html; this.currentRoute = route; if (pushState) history.pushState({ route }, '', `#${route}`); events.emit('routeChanged', { route }); }
