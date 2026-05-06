@@ -10,9 +10,9 @@
   <meta property="og:description" content="Управление проектами ремонта.">
   <meta property="og:type" content="website">
   
-  <link rel="stylesheet" href="../css/global.css">
-  <link rel="stylesheet" href="../css/components.css">
-  <link rel="stylesheet" href="../css/pages/home.css">
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/pages/home.css">
 </head>
 <body>
   <div id="app-content">
@@ -32,7 +32,9 @@
               <dd style="font-size: 12px; color: var(--text-secondary); margin: 0;" id="tariff-days">Осталось 14 дней</dd>
             </div>
             <dd style="margin: 0;">
-              <a href="#tariffs" class="tariff-link" aria-label="Перейти к выбору тарифа">Сменить тариф</a>
+              <a href="#tariffs" class="tariff-link" 
+                 onclick="event.preventDefault();window.App?.router.navigate('tariffs')"
+                 aria-label="Перейти к выбору тарифа">Сменить тариф</a>
             </dd>
           </div>
         </dl>
@@ -85,22 +87,26 @@
   <nav class="tab-bar" aria-label="Основная навигация">
     <ul style="display: flex; justify-content: space-around; width: 100%; list-style: none; padding: 0; margin: 0;">
       <li>
-        <a href="#home" class="tab-item active" aria-current="page">
+        <a href="#home" class="tab-item active" aria-current="page"
+           onclick="event.preventDefault();window.App?.router.navigate('home')">
           <span aria-hidden="true">📋</span> Проекты
         </a>
       </li>
       <li>
-        <a href="#archive" class="tab-item">
+        <a href="#archive" class="tab-item"
+           onclick="event.preventDefault();window.App?.router.navigate('archive')">
           <span aria-hidden="true">📁</span> Архив
         </a>
       </li>
       <li>
-        <a href="#templates" class="tab-item">
+        <a href="#templates" class="tab-item"
+           onclick="event.preventDefault();window.App?.router.navigate('templates')">
           <span aria-hidden="true">📄</span> Шаблоны
         </a>
       </li>
       <li>
-        <a href="#profile" class="tab-item">
+        <a href="#profile" class="tab-item"
+           onclick="event.preventDefault();window.App?.router.navigate('profile')">
           <span aria-hidden="true">⚙️</span> Ещё
         </a>
       </li>
@@ -131,7 +137,7 @@
   </style>
 
   <!-- [AP-008] Только внешние скрипты -->
-  <script src="../js/pages/home.js"></script>
-  <script type="module" src="../js/core/app.js"></script>
+  <script src="js/pages/home.js"></script>
+  <script type="module" src="js/core/app.js"></script>
 </body>
 </html>
