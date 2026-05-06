@@ -1,5 +1,6 @@
+// js/core/app.js
 // [AP-001] Точка входа
-// Роутер запускается только если страница открыта через SPA (есть #app-content)
+// FIX-001: Роутер не перехватывает прямые страницы
 
 import { store } from './store.js';
 import { router } from './router.js';
@@ -14,7 +15,7 @@ class App {
   }
 
   init() {
-    // Если нет контейнера #app-content — страница открыта напрямую, роутер не нужен
+    // FIX-001: Если нет контейнера — страница открыта напрямую, роутер не запускается
     if (!document.getElementById('app-content')) {
       console.log('[App] Direct page access — router skipped');
       return;
