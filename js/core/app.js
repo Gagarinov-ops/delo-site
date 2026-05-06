@@ -1,5 +1,5 @@
-// [AP-001] Точка входа, 30 строк
-// Стартовый маршрут — landing для всех
+// [AP-001] Точка входа
+// Роутер запускается только если страница открыта через SPA (есть #app-content)
 
 import { store } from './store.js';
 import { router } from './router.js';
@@ -14,17 +14,19 @@ class App {
   }
 
   init() {
-    const hash = window.location.hash.replace('#', '');
+    // Если нет контейнера #app-content — страница открыта напрямую, роутер не нужен
+    if (!document.getElementById('app-content')) {
+      console.log('[App] Direct page access — router skipped');
+      return;
+    }
 
+    const hash = window.location.hash.replace('#', '');
     let startRoute = 'landing';
 
-    // Если пользователь авторизован и есть хеш — используем его
     const user = store.getState().user;
     if (user.id && !user.isGuest && hash && router.routes[hash]) {
       startRoute = hash;
-    }
-    // Если в хеше явно указан auth — идём на auth
-    else if (hash === 'auth') {
+    } else if (hash === 'auth') {
       startRoute = 'auth';
     }
 

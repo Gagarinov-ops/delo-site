@@ -1,5 +1,5 @@
-// Лендинг: лайтбокс с 3 шагами, 40 строк
-// Все пути — относительные
+// Лендинг: лайтбокс с 3 шагами
+// Все пути — относительные для GitHub Pages
 
 (function () {
   console.log('[Landing] Script loaded');
@@ -51,7 +51,6 @@
           tariff: 'guest',
         })
       );
-      // Относительный путь для GitHub Pages
       window.location.href = 'pages/auth.html';
     });
   }
