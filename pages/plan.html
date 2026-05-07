@@ -1,5 +1,3 @@
-<!DOCTYPE html>
-<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -61,6 +59,9 @@
       <figcaption style="position: absolute; width: 1px; height: 1px; overflow: hidden;">План помещения с сеткой</figcaption>
     </figure>
 
+    <!-- Подпись масштаба -->
+    <div id="grid-label" style="text-align: center; font-size: 12px; color: #666666; margin-top: 4px;"></div>
+
     <nav class="tools-panel" role="toolbar" aria-label="Инструменты редактирования плана"></nav>
 
     <footer class="calculate-btn">
@@ -71,8 +72,14 @@
     </footer>
   </main>
 
-  <!-- [AP-008] Только внешние скрипты -->
+         <!-- [AP-008] Только внешние скрипты -->
+  <script src="../js/shared/snap.js"></script>
+  <script src="../js/shared/unit-utils.js"></script>
+  <script src="../js/features/plan/state.js"></script>
+  <script src="../js/features/plan/grid.js"></script>
+  <script src="../js/features/plan/toolbar.js"></script>
+  <script src="../js/features/plan/render.js"></script>
+  <script src="../js/features/plan/draw-line.js"></script>
   <script src="../js/pages/plan.js"></script>
   <script type="module" src="../js/core/app.js"></script>
 </body>
-</html>
