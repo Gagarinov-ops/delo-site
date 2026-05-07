@@ -3,7 +3,7 @@
 /**
  * DrawLine — инструмент рисования линии
  * Обработчики pointerdown/pointermove/pointerup
- * Превью (зелёный пунктир), снап, фиксация через Render.addLine()
+ * Превью (зелёный пунктир), снап, фиксация через Actions.addLine()
  */
 
 try {
@@ -14,9 +14,6 @@ try {
     currentX: 0,
     currentY: 0,
 
-    /**
-     * Подключить обработчики к canvas
-     */
     init() {
       const canvas = Grid.canvas;
       if (!canvas) {
@@ -37,9 +34,6 @@ try {
       }, { passive: false });
     },
 
-    /**
-     * Получить координаты с учётом масштаба canvas
-     */
     getCanvasCoords(e) {
       const canvas = Grid.canvas;
       const rect = canvas.getBoundingClientRect();
@@ -51,9 +45,6 @@ try {
       };
     },
 
-    /**
-     * Нажатие — начало линии
-     */
     onDown(e) {
       if (Toolbar.getActiveTool() !== 'line') return;
       e.preventDefault();
@@ -69,9 +60,6 @@ try {
       this.currentY = snapped.y;
     },
 
-    /**
-     * Движение — обновление превью
-     */
     onMove(e) {
       if (!this.isDrawing || Toolbar.getActiveTool() !== 'line') return;
       e.preventDefault();
@@ -86,9 +74,6 @@ try {
       this.showPreview();
     },
 
-    /**
-     * Отпускание — фиксация линии
-     */
     onUp(e) {
       if (!this.isDrawing || Toolbar.getActiveTool() !== 'line') return;
       e.preventDefault();
@@ -100,16 +85,13 @@ try {
       this.currentX = snapped.x;
       this.currentY = snapped.y;
 
-      Render.addLine(this.startX, this.startY, this.currentX, this.currentY);
+      Actions.addLine(this.startX, this.startY, this.currentX, this.currentY);
 
       this.isDrawing = false;
       Grid.draw();
       Render.drawAll();
     },
 
-    /**
-     * Показать превью линии (зелёный пунктир)
-     */
     showPreview() {
       Grid.draw();
       Render.drawAll();

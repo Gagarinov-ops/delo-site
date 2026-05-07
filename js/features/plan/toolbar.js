@@ -2,8 +2,8 @@
 
 /**
  * Toolbar — панель инструментов
- * Три режима: cursor, line
- * Кнопка Отменить управляет TetrisState.shapes
+ * Кнопки: Курсор, Линия, Элементы, Отменить
+ * Панель элементов генерируется из ElementLibrary
  * Сохраняет активный инструмент в delo_activeTool
  */
 
@@ -14,10 +14,10 @@ try {
       { id: 'line', label: '📏 Линия' }
     ],
     activeTool: null,
+    elementsVisible: false,
 
     init() {
       this.render();
-      this.updateUndoButton();
     },
 
     render() {
@@ -43,6 +43,15 @@ try {
         panel.appendChild(btn);
       });
 
+      // Кнопка Элементы
+      const elemBtn = document.createElement('button');
+      elemBtn.type = 'button';
+      elemBtn.className = 'tool-btn elements-toggle';
+      elemBtn.textContent = '📦 Элементы';
+      elemBtn.setAttribute('aria-expanded', this.elementsVisible ? 'true' : 'false');
+      elemBtn.addEventListener('click', () => this.toggleElements());
+      panel.appendChild(elemBtn);
+
       // Разделитель
       const sep = document.createElement('span');
       sep.className = 'tool-separator';
@@ -59,10 +68,51 @@ try {
       undoBtn.addEventListener('click', () => this.undo());
       panel.appendChild(undoBtn);
 
+      // Панель элементов (если открыта)
+      if (this.elementsVisible) {
+        this.renderElementsPanel();
+      }
+
       this.updateUndoButton();
     },
 
+    toggleElements() {
+      this.elementsVisible = !this.elementsVisible;
+      this.render();
+    },
+
+    renderElementsPanel() {
+      const container = document.querySelector('.tools-panel');
+      if (!container) return;
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'elements-panel';
+
+      ElementLibrary.forEach(item => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'tool-btn element-btn';
+        btn.textContent = item.icon + ' ' + item.label;
+        btn.dataset.elementType = item.type;
+        btn.addEventListener('click', () => this.selectElement(item));
+        wrapper.appendChild(btn);
+      });
+
+      container.appendChild(wrapper);
+    },
+
+    selectElement(item) {
+      this.elementsVisible = false;
+      this.render();
+      DragDrop.activate(item);
+    },
+
     setTool(toolId) {
+      // Деактивируем DragDrop при переключении инструмента
+      if (DragDrop && DragDrop.isActive) {
+        DragDrop.deactivate();
+      }
+
       if (this.activeTool === toolId) {
         this.activeTool = null;
       } else {
@@ -77,20 +127,13 @@ try {
     },
 
     undo() {
-      if (TetrisState.shapes.length > 0) {
-        TetrisState.shapes.pop();
-        Grid.draw();
-        if (window.Render && Render.drawAll) {
-          Render.drawAll();
-        }
-        this.updateUndoButton();
-      }
+      Actions.undo();
     },
 
     updateUndoButton() {
       const btn = document.getElementById('undo-btn');
       if (btn) {
-        btn.disabled = TetrisState.shapes.length === 0;
+        btn.disabled = TetrisState.history.length === 0;
       }
     }
   };
