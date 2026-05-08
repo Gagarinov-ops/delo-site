@@ -24,3 +24,105 @@
 [2026-05-07T15:54:02.481Z] Тележка: замечены изменения в delo_input.txt
 [2026-05-07T15:54:02.484Z] Записан файл: js/features/plan/draw-line.js
 [2026-05-07T15:54:02.485Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T07:07:21.271Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T07:07:21.273Z] Записан файл: js/features/deploy-bot/delo-console.js
+[2026-05-08T07:07:21.290Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T07:08:25.265Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T07:08:25.268Z] Записан файл: js/features/deploy-bot/delo-console.js
+[2026-05-08T07:08:25.269Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T07:10:27.107Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T07:10:27.109Z] Записан файл: js/features/deploy-bot/delo-console.js
+[2026-05-08T07:10:27.110Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T07:24:11.791Z] Тележка: получен запрос на чтение файлов
+[2026-05-08T07:24:11.798Z] Возвращено файлов: 1. Ответ дописан в delo_input.txt.
+[2026-05-08T07:25:24.439Z] Тележка: получен запрос на чтение файлов
+[2026-05-08T07:25:24.444Z] Возвращено файлов: 1. Ответ дописан в delo_input.txt.
+[2026-05-08T08:21:58.301Z] Тележка: получен запрос на чтение файлов
+[2026-05-08T08:21:58.305Z] Возвращено файлов: 1. Ответ дописан в delo_input.txt.
+[2026-05-08T08:24:12.706Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T08:24:12.709Z] Записан файл: pages/index.html
+[2026-05-08T08:24:12.711Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T13:32:01.513Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T13:32:01.517Z] Записан файл: js/features/deploy-bot/delo-console.js
+[2026-05-08T13:32:01.522Z] Записан файл: js/features/deploy-bot/delo-console-ui.js
+[2026-05-08T13:32:01.523Z] Обработано команд: 2. Входной файл очищен.
+[2026-05-08T16:57:30.722Z] Тележка: замечены изменения в delo_input.txt
+[2026-05-08T16:57:30.725Z] Записан файл: js/features/deploy-bot/watcher.js
+[2026-05-08T16:57:30.728Z] Обработано команд: 1. Входной файл очищен.
+[2026-05-08T17:01:21.433Z] Тележка: запущена
+[2026-05-08T17:01:21.435Z] Наблюдение: js/features/deploy-bot/delo_inbox/delo_input.txt
+[2026-05-08T17:01:21.437Z] Файл не найден, наблюдение не активно: D:/Yandex.Disk/DeloSite_Telega/delo_input.txt
+[2026-05-08T17:11:36.901Z] Тележка: запущена
+[2026-05-08T17:11:36.903Z] Наблюдение: js/features/deploy-bot/delo_inbox/delo_input.txt
+[2026-05-08T17:11:36.905Z] Наблюдение: D:/Yandex.Disk/DeloSite_Telega/delo_input.txt
+[2026-05-08T17:12:31.527Z] Тележка: замечены изменения в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T17:12:31.530Z] Создана папка: js\features\deploy-bot\test
+[2026-05-08T17:12:31.533Z] Записан файл: js/features/deploy-bot/test/cloud-test.txt
+[2026-05-08T17:12:31.536Z] Обработано команд: 1. Файл D:\Yandex.Disk\DeloSite_Telega\delo_input.txt очищен.k
+[2026-05-08T18:04:45.706Z] Тележка: получен запрос на чтение файлов из D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:04:45.750Z] Возвращено файлов: 1. Ответ дописан в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt.
+[2026-05-08T18:07:50.812Z] Тележка: замечены изменения в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:07:50.814Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:07:50.816Z] Обработано команд: 1. Файл D:\Yandex.Disk\DeloSite_Telega\delo_input.txt очищен.
+[2026-05-08T18:08:44.360Z] Тележка: замечены изменения в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:08:44.362Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:08:44.364Z] Обработано команд: 1. Файл D:\Yandex.Disk\DeloSite_Telega\delo_input.txt очищен.
+[2026-05-08T18:11:22.471Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T18:11:22.473Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:11:22.474Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T18:13:54.024Z] Тележка: получен запрос на чтение файлов из D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:13:54.028Z] Возвращено файлов: 1. Ответ дописан в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt.
+[2026-05-08T18:17:06.616Z] Тележка: замечены изменения в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:17:06.619Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:17:06.626Z] Обработано команд: 1. Файл D:\Yandex.Disk\DeloSite_Telega\delo_input.txt очищен.
+[2026-05-08T18:17:52.398Z] Тележка: замечены изменения в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:17:52.401Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:17:52.403Z] Обработано команд: 1. Файл D:\Yandex.Disk\DeloSite_Telega\delo_input.txt очищен.
+[2026-05-08T18:27:48.621Z] Тележка: получен запрос на чтение файлов из D:\Yandex.Disk\DeloSite_Telega\delo_input.txt
+[2026-05-08T18:27:48.626Z] Возвращено файлов: 2. Ответ дописан в D:\Yandex.Disk\DeloSite_Telega\delo_input.txt.
+[2026-05-08T18:38:00.329Z] Тележка: запущена
+[2026-05-08T18:38:00.331Z] Наблюдение: js/features/deploy-bot/delo_inbox/delo_input.txt
+[2026-05-08T18:38:00.333Z] Наблюдение: D:/Yandex.Disk/DeloSite_Telega/delo_input.txt
+[2026-05-08T18:39:29.155Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T18:39:29.160Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T18:39:29.163Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T18:39:57.876Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T18:39:57.878Z] Записан файл: js/features/plan/actions.js
+[2026-05-08T18:39:57.879Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:03:38.289Z] Тележка: запущена
+[2026-05-08T19:03:38.291Z] Наблюдение: js/features/deploy-bot/delo_inbox/delo_input.txt
+[2026-05-08T19:03:38.293Z] Наблюдение: D:/Yandex.Disk/DeloSite_Telega/delo_input.txt
+[2026-05-08T19:08:29.329Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:08:29.331Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T19:08:29.331Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:08:36.310Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:08:36.312Z] Записан файл: js/features/plan/actions.js
+[2026-05-08T19:08:36.312Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:21:05.828Z] Тележка: получен запрос на чтение файлов из js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:21:05.830Z] Возвращено файлов: 2. Ответ дописан в js\features\deploy-bot\delo_inbox\delo_input.txt.
+[2026-05-08T19:23:02.799Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:23:02.801Z] Записан файл: pages/plan.html
+[2026-05-08T19:23:02.801Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:23:19.068Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:23:19.070Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T19:23:19.070Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:23:33.628Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:23:33.630Z] Записан файл: js/features/plan/input-dispatcher.js
+[2026-05-08T19:23:33.631Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:28:11.689Z] Тележка: получен запрос на чтение файлов из js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:28:11.691Z] Возвращено файлов: 2. Ответ дописан в js\features\deploy-bot\delo_inbox\delo_input.txt.
+[2026-05-08T19:30:54.995Z] Тележка: запущена
+[2026-05-08T19:30:54.997Z] Наблюдение: js/features/deploy-bot/delo_inbox/delo_input.txt
+[2026-05-08T19:30:54.998Z] Наблюдение: D:/Yandex.Disk/DeloSite_Telega/delo_input.txt
+[2026-05-08T19:31:13.735Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:31:13.737Z] Записан файл: pages/plan.html
+[2026-05-08T19:31:13.737Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:31:24.804Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:31:24.805Z] Записан файл: js/features/plan/draw-line.js
+[2026-05-08T19:31:24.806Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:31:37.781Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:31:37.782Z] Записан файл: js/features/plan/input-dispatcher.js
+[2026-05-08T19:31:37.782Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.
+[2026-05-08T19:31:51.375Z] Тележка: замечены изменения в js\features\deploy-bot\delo_inbox\delo_input.txt
+[2026-05-08T19:31:51.377Z] Записан файл: js/features/plan/drag-shape.js
+[2026-05-08T19:31:51.379Z] Обработано команд: 1. Файл js\features\deploy-bot\delo_inbox\delo_input.txt очищен.

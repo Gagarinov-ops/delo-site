@@ -3,15 +3,18 @@
 const fs = require('fs');
 const path = require('path');
 
-const { delo_writeLog, delo_isSafePath, delo_getFiles, PROJECT_ROOT } = require('./delo_utils');
+const { delo_writeLog, delo_isSafePath, PROJECT_ROOT } = require('./delo_utils');
 const { delo_tryRun, delo_release } = require('./delo_queue');
 
-const DELO_INBOX_FILE = path.join(__dirname, 'delo_inbox', 'delo_input.txt');
+const WATCH_FILES = [
+  'js/features/deploy-bot/delo_inbox/delo_input.txt',
+  'D:/Yandex.Disk/DeloSite_Telega/delo_input.txt'
+];
+
 const DELO_FILE_PREFIX = '>>> file:';
 const DELO_GET_PREFIX = '>>> get:';
 
-let delo_lastSize = 0;
-let delo_lastMtime = 0;
+const delo_fileStates = {};
 
 function delo_processFileCommands(content) {
   const lines = content.split('\n');
@@ -58,29 +61,28 @@ function delo_writeFile(relativePath, code) {
   delo_writeLog(`Записан файл: ${relativePath.trim()}`);
 }
 
-function delo_processInbox() {
-  if (!fs.existsSync(DELO_INBOX_FILE)) return;
+function delo_processInbox(inboxPath) {
+  if (!fs.existsSync(inboxPath)) return;
 
-  const content = fs.readFileSync(DELO_INBOX_FILE, 'utf-8');
+  const content = fs.readFileSync(inboxPath, 'utf-8');
+  const displayPath = path.relative(PROJECT_ROOT, inboxPath);
 
   if (content.includes(DELO_FILE_PREFIX)) {
-    delo_writeLog('Тележка: замечены изменения в delo_input.txt');
+    delo_writeLog(`Тележка: замечены изменения в ${displayPath}`);
     const count = delo_processFileCommands(content);
 
-    fs.writeFileSync(DELO_INBOX_FILE, '', 'utf-8');
+    fs.writeFileSync(inboxPath, '', 'utf-8');
     try {
-      const stat = fs.statSync(DELO_INBOX_FILE);
-      delo_lastSize = stat.size;
-      delo_lastMtime = stat.mtimeMs;
+      const stat = fs.statSync(inboxPath);
+      if (delo_fileStates[inboxPath]) {
+        delo_fileStates[inboxPath].lastSize = stat.size;
+        delo_fileStates[inboxPath].lastMtime = stat.mtimeMs;
+      }
     } catch (_) { /* ок */ }
 
-    delo_writeLog(`Обработано команд: ${count}. Входной файл очищен.`);
-    delo_release(delo_writeLog);
-    return;
-  }
-
-  if (content.includes(DELO_GET_PREFIX)) {
-    delo_writeLog('Тележка: получен запрос на чтение файлов');
+    delo_writeLog(`Обработано команд: ${count}. Файл ${displayPath} очищен.`);
+  } else if (content.includes(DELO_GET_PREFIX)) {
+    delo_writeLog(`Тележка: получен запрос на чтение файлов из ${displayPath}`);
 
     const paths = [];
     const remainingLines = [];
@@ -93,56 +95,76 @@ function delo_processInbox() {
       }
     }
 
+    const { delo_getFiles } = require('./delo_utils');
     const response = delo_getFiles(paths);
-
-    // Собираем итог: оставшиеся строки + ответ
     const newContent = remainingLines.join('\n').trimEnd() + '\n' + response;
 
-    fs.writeFileSync(DELO_INBOX_FILE, newContent, 'utf-8');
+    fs.writeFileSync(inboxPath, newContent, 'utf-8');
     try {
-      const stat = fs.statSync(DELO_INBOX_FILE);
-      delo_lastSize = stat.size;
-      delo_lastMtime = stat.mtimeMs;
+      const stat = fs.statSync(inboxPath);
+      if (delo_fileStates[inboxPath]) {
+        delo_fileStates[inboxPath].lastSize = stat.size;
+        delo_fileStates[inboxPath].lastMtime = stat.mtimeMs;
+      }
     } catch (_) { /* ок */ }
 
-    delo_writeLog(`Возвращено файлов: ${paths.length}. Ответ дописан в delo_input.txt.`);
-    delo_release(delo_writeLog);
+    delo_writeLog(`Возвращено файлов: ${paths.length}. Ответ дописан в ${displayPath}.`);
+  } else {
+    delo_writeLog('Команды не найдены');
     return;
   }
 
-  delo_writeLog('Команды не найдены');
+  delo_release(delo_writeLog);
 }
 
-function delo_onChange() {
+function delo_onChange(filePath) {
+  const state = delo_fileStates[filePath];
+  if (!state) return;
+
   try {
-    const stat = fs.statSync(DELO_INBOX_FILE);
-    if (stat.size === delo_lastSize && stat.mtimeMs === delo_lastMtime) return;
+    const stat = fs.statSync(filePath);
+    if (stat.size === state.lastSize && stat.mtimeMs === state.lastMtime) return;
     if (stat.size === 0) return;
-    delo_lastSize = stat.size;
-    delo_lastMtime = stat.mtimeMs;
+    state.lastSize = stat.size;
+    state.lastMtime = stat.mtimeMs;
   } catch (_) {
     return;
   }
 
-  setTimeout(() => delo_tryRun(delo_processInbox, delo_writeLog), 50);
+  setTimeout(() => {
+    delo_tryRun(() => delo_processInbox(filePath), delo_writeLog);
+  }, 50);
 }
 
 function delo_init() {
-  console.log(`Тележка: запущена, слежу за ${path.relative(PROJECT_ROOT, DELO_INBOX_FILE)}`);
+  console.log('Тележка: запущена, слежу за:');
   delo_writeLog('Тележка: запущена');
 
-  try {
-    const stat = fs.statSync(DELO_INBOX_FILE);
-    delo_lastSize = stat.size;
-    delo_lastMtime = stat.mtimeMs;
-  } catch (_) {
-    delo_lastSize = 0;
-    delo_lastMtime = 0;
-  }
+  for (const relativePath of WATCH_FILES) {
+    const fullPath = path.resolve(PROJECT_ROOT, relativePath);
+    
+    if (fs.existsSync(fullPath)) {
+      console.log(`  ${relativePath}`);
+      delo_writeLog(`Наблюдение: ${relativePath}`);
+      
+      try {
+        const stat = fs.statSync(fullPath);
+        delo_fileStates[fullPath] = {
+          lastSize: stat.size,
+          lastMtime: stat.mtimeMs
+        };
+      } catch (_) {
+        delo_fileStates[fullPath] = { lastSize: 0, lastMtime: 0 };
+      }
 
-  fs.watch(DELO_INBOX_FILE, (eventType) => {
-    if (eventType === 'change') delo_onChange();
-  });
+      fs.watch(fullPath, (eventType) => {
+        if (eventType === 'change') delo_onChange(fullPath);
+      });
+    } else {
+      console.log(`  ${relativePath} — файл не найден, пропускаю`);
+      delo_writeLog(`Файл не найден, наблюдение не активно: ${relativePath}`);
+    }
+  }
 }
 
 delo_init();

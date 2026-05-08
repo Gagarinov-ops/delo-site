@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * DrawLine — инструмент рисования линии
- * Обработчики pointerdown/pointermove/pointerup
+ * DrawLine — инструмент рисования линий
  * Превью (зелёный пунктир), снап, фиксация через Actions.addLine()
+ * Обработчики вызываются из InputDispatcher
  */
 
 try {
@@ -13,26 +13,6 @@ try {
     startY: 0,
     currentX: 0,
     currentY: 0,
-
-    init() {
-      const canvas = Grid.canvas;
-      if (!canvas) {
-        setTimeout(() => this.init(), 100);
-        return;
-      }
-
-      canvas.addEventListener('pointerdown', (e) => this.onDown(e));
-      canvas.addEventListener('pointermove', (e) => this.onMove(e));
-      canvas.addEventListener('pointerup', (e) => this.onUp(e));
-
-      canvas.addEventListener('touchstart', (e) => {
-        if (e.target === canvas) e.preventDefault();
-      }, { passive: false });
-
-      canvas.addEventListener('touchmove', (e) => {
-        if (e.target === canvas) e.preventDefault();
-      }, { passive: false });
-    },
 
     getCanvasCoords(e) {
       const canvas = Grid.canvas;
@@ -46,9 +26,7 @@ try {
     },
 
     onDown(e) {
-      if (Toolbar.getActiveTool() !== 'line') return;
       e.preventDefault();
-
       const coords = this.getCanvasCoords(e);
       const step = getCellSize('cm');
       const snapped = snap(coords.x, coords.y, step);
@@ -61,7 +39,7 @@ try {
     },
 
     onMove(e) {
-      if (!this.isDrawing || Toolbar.getActiveTool() !== 'line') return;
+      if (!this.isDrawing) return;
       e.preventDefault();
 
       const coords = this.getCanvasCoords(e);
@@ -70,12 +48,11 @@ try {
 
       this.currentX = snapped.x;
       this.currentY = snapped.y;
-
       this.showPreview();
     },
 
     onUp(e) {
-      if (!this.isDrawing || Toolbar.getActiveTool() !== 'line') return;
+      if (!this.isDrawing) return;
       e.preventDefault();
 
       const coords = this.getCanvasCoords(e);
@@ -109,15 +86,6 @@ try {
       ctx.setLineDash([]);
     }
   };
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const waitForGrid = setInterval(() => {
-      if (Grid.canvas) {
-        clearInterval(waitForGrid);
-        DrawLine.init();
-      }
-    }, 50);
-  });
 
   window.DrawLine = DrawLine;
 
