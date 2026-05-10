@@ -3,6 +3,7 @@
 /**
  * Actions — управление фигурами и историей
  * Единственная точка добавления/удаления/перемещения фигур
+ * После addLine вызывает проверку замкнутого контура
  */
 
 try {
@@ -33,6 +34,12 @@ try {
       Grid.draw();
       Render.drawAll();
       Toolbar.updateUndoButton();
+
+      // Проверка замкнутого контура
+      const contour = DetectRoom.detect();
+      if (contour) {
+        RoomBuilder.build(contour);
+      }
     },
 
     addElement(elementType, x, y) {
