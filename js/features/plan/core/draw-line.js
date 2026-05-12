@@ -14,20 +14,9 @@ try {
     currentX: 0,
     currentY: 0,
 
-    getCanvasCoords(e) {
-      const canvas = Grid.canvas;
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-      };
-    },
-
     onDown(e) {
       e.preventDefault();
-      const coords = this.getCanvasCoords(e);
+      const coords = CanvasUtils.getCanvasCoords(e);
       const step = getCellSize('cm');
       const snapped = snap(coords.x, coords.y, step);
 
@@ -42,7 +31,7 @@ try {
       if (!this.isDrawing) return;
       e.preventDefault();
 
-      const coords = this.getCanvasCoords(e);
+      const coords = CanvasUtils.getCanvasCoords(e);
       const step = getCellSize('cm');
       const snapped = snap(coords.x, coords.y, step);
 
@@ -55,7 +44,7 @@ try {
       if (!this.isDrawing) return;
       e.preventDefault();
 
-      const coords = this.getCanvasCoords(e);
+      const coords = CanvasUtils.getCanvasCoords(e);
       const step = getCellSize('cm');
       const snapped = snap(coords.x, coords.y, step);
 

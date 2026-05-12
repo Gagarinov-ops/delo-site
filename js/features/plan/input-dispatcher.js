@@ -28,17 +28,6 @@ try {
       }, { passive: false });
     },
 
-    getCanvasCoords(e) {
-      const canvas = Grid.canvas;
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      return {
-        x: (e.clientX - rect.left) * scaleX,
-        y: (e.clientY - rect.top) * scaleY
-      };
-    },
-
     onDown(e) {
       const tool = Toolbar.getActiveTool();
 
@@ -48,7 +37,7 @@ try {
           break;
         case 'cursor':
           e.preventDefault();
-          const coords = this.getCanvasCoords(e);
+          const coords = CanvasUtils.getCanvasCoords(e);
           const shape = DragShape.selectShape(coords.x, coords.y);
           if (shape) {
             DragShape.startDrag(shape, coords.x, coords.y);
@@ -69,7 +58,7 @@ try {
         case 'cursor':
           if (DragShape.isDragging) {
             e.preventDefault();
-            const coords = this.getCanvasCoords(e);
+            const coords = CanvasUtils.getCanvasCoords(e);
             DragShape.moveDrag(coords.x, coords.y);
           }
           break;

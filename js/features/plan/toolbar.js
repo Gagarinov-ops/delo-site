@@ -104,15 +104,9 @@ try {
     selectElement(item) {
       this.elementsVisible = false;
       this.render();
-      DragDrop.activate(item);
     },
 
     setTool(toolId) {
-      // Деактивируем DragDrop при переключении инструмента
-      if (DragDrop && DragDrop.isActive) {
-        DragDrop.deactivate();
-      }
-
       if (this.activeTool === toolId) {
         this.activeTool = null;
       } else {

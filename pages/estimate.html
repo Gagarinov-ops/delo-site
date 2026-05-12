@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Дело.Сайт — Смета</title>
+  <link rel="stylesheet" href="../css/global.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/pages/estimate.css">
+</head>
+<body>
+  <main id="estimator-app">
+    <h1>Смета</h1>
+    <div id="estimator-form"></div>
+    <div id="estimator-table"></div>
+    <div id="estimator-summary"></div>
+  </main>
+
+  <!-- Общие утилиты -->
+  <script src="../js/shared/snap.js"></script>
+  <script src="../js/shared/unit-utils.js"></script>
+
+  <!-- Модуль Сметы -->
+  <script src="../js/features/estimator/state.js"></script>
+  <script src="../js/features/estimator/actions.js"></script>
+  <script src="../js/features/estimator/table.js"></script>
+  <script src="../js/features/estimator/form.js"></script>
+  <script src="../js/features/estimator/summary.js"></script>
+
+  <!-- Ядро приложения -->
+  <script type="module" src="../js/core/app.js"></script>
+</body>
+</html>

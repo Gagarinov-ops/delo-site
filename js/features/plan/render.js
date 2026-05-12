@@ -13,7 +13,7 @@ try {
 
       const step = getCellSize('cm');
 
-      // Сначала рисуем комнаты (заливка)
+      // Сначала рисуем комнаты (заливка + стены)
       TetrisState.shapes.forEach(shape => {
         if (shape.type === 'room') {
           this._drawRoom(ctx, shape);
@@ -67,16 +67,15 @@ try {
     },
 
     /**
-     * Заливка комнаты
+     * Заливка комнаты и отрисовка стен
      */
     _drawRoom(ctx, room) {
       if (!room.walls || room.walls.length < 3) return;
 
-      // Строим полигон
+      // Строим полигон для заливки
       const points = [];
       const used = new Set();
 
-      // Находим порядок точек
       let currentX = room.walls[0].x1;
       let currentY = room.walls[0].y1;
       points.push({ x: currentX, y: currentY });
@@ -111,6 +110,17 @@ try {
         ctx.closePath();
         ctx.fill();
       }
+
+      // Рисуем стены зелёным
+      ctx.strokeStyle = '#00A651';
+      ctx.lineWidth = 3;
+      ctx.setLineDash([]);
+      room.walls.forEach(wall => {
+        ctx.beginPath();
+        ctx.moveTo(wall.x1, wall.y1);
+        ctx.lineTo(wall.x2, wall.y2);
+        ctx.stroke();
+      });
     },
 
     /**
@@ -128,7 +138,6 @@ try {
         const midX = (wall.x1 + wall.x2) / 2;
         const midY = (wall.y1 + wall.y2) / 2;
 
-        // Смещение подписи перпендикулярно стене
         const dx = wall.x2 - wall.x1;
         const dy = wall.y2 - wall.y1;
         const len = Math.hypot(dx, dy);
@@ -140,7 +149,6 @@ try {
         ctx.fillText(wall.name, midX + nx, midY + ny);
       });
 
-      // Название комнаты в центре
       if (room.center && room.label) {
         ctx.fillStyle = '#2D2D2D';
         ctx.font = '11px InterVariable, -apple-system, sans-serif';
