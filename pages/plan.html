@@ -61,6 +61,9 @@
     <!-- Подпись масштаба -->
     <div id="grid-label" style="text-align: center; font-size: 12px; color: #666666; margin-top: 4px;"></div>
 
+    <!-- Контейнер для названия комнаты (не перекрыт) -->
+    <div id="room-label-container" style="display:none; margin: 8px 16px;"></div>
+
     <nav class="tools-panel" role="toolbar" aria-label="Инструменты редактирования плана"></nav>
 
     <footer class="calculate-btn">
@@ -78,15 +81,23 @@
   <script src="../js/shared/canvas-utils.js"></script>
   <script src="../js/features/plan/core/state.js"></script>
   <script src="../js/features/plan/core/grid.js"></script>
-  <script src="../js/features/plan/toolbar.js"></script>
-  <script src="../js/features/plan/element-library.js"></script>
+  <script src="../js/features/plan/tools/toolbar.js"></script>
+  <script src="../js/features/plan/tools/element-library.js"></script>
+  <script src="../js/features/plan/room/render-room.js"></script>
   <script src="../js/features/plan/render.js"></script>
   <script src="../js/features/plan/core/actions.js"></script>
-  <script src="../js/features/plan/dfs-utils.js"></script>
-  <script src="../js/features/plan/detect-room.js"></script>
-  <script src="../js/features/plan/room-builder.js"></script>
-  <script src="../js/features/plan/drag-shape.js"></script>
-  <script src="../js/features/plan/input-dispatcher.js"></script>
+  <script src="../js/features/plan/geometry/state.js"></script>
+  <script src="../js/features/plan/geometry/solver.js"></script>
+  <script src="../js/features/plan/geometry/connector.js"></script>
+  <script src="../js/features/plan/room/stitch.js"></script>
+  <script src="../js/features/plan/room/dfs-utils.js"></script>
+  <script src="../js/features/plan/room/detect-room.js"></script>
+  <script src="../js/features/plan/room/room-builder.js"></script>
+  <script src="../js/features/plan/room/room-label.js"></script>
+  <script src="../js/features/plan/tools/drag-shape.js"></script>
+  <script src="../js/features/plan/room/wall-geometry.js"></script>
+  <script src="../js/features/plan/room/wall-input.js"></script>
+  <script src="../js/features/plan/tools/input-dispatcher.js"></script>
   <script src="../js/features/plan/core/draw-line.js"></script>
   <script src="../js/pages/plan.js"></script>
   <script type="module" src="../js/core/app.js"></script>

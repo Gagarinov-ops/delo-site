@@ -3,7 +3,7 @@
 /**
  * EstimatorForm — форма добавления позиции в смету
  * Семантические поля с label, кнопка Добавить
- * Фокус на "0" очищает поле, валидация с сообщениями под формой
+ * Фокус на "0" очищает поле, валидация делегирована в FormValidation
  */
 
 try {
@@ -16,19 +16,11 @@ try {
       form.id = 'add-item-form';
       form.setAttribute('novalidate', '');
 
-      // Поле Название
       form.appendChild(this._createField('Название', 'item-name', 'text', 'Например: Штукатурка'));
-
-      // Поле Ед. изм.
       form.appendChild(this._createField('Ед. изм.', 'item-unit', 'text', 'м², шт., пог.м'));
-
-      // Поле Количество
       form.appendChild(this._createField('Количество', 'item-qty', 'number', '0', '0', 'step="any" min="0"'));
-
-      // Поле Цена
       form.appendChild(this._createField('Цена', 'item-price', 'number', '0', '0', 'step="any" min="0"'));
 
-      // Блок ошибок
       const errorDiv = document.createElement('div');
       errorDiv.id = 'form-error';
       errorDiv.style.color = 'var(--red-error, #D32F2F)';
@@ -36,7 +28,6 @@ try {
       errorDiv.style.marginTop = '8px';
       form.appendChild(errorDiv);
 
-      // Кнопка Добавить
       const btn = document.createElement('button');
       btn.type = 'submit';
       btn.className = 'btn-primary';
@@ -45,12 +36,11 @@ try {
 
       form.addEventListener('submit', (e) => {
         e.preventDefault();
-        this._handleSubmit();
+        FormValidation.validateAndAdd();
       });
 
       container.appendChild(form);
 
-      // Навешиваем поведение на числовые поля
       this._setupNumericField('item-qty');
       this._setupNumericField('item-price');
     },
@@ -88,69 +78,19 @@ try {
       if (!field) return;
 
       field.addEventListener('focus', () => {
-        if (field.value === '0') {
-          field.value = '';
-        }
+        if (field.value === '0') field.value = '';
       });
 
       field.addEventListener('blur', () => {
-        if (field.value.trim() === '') {
-          field.value = '0';
-        }
+        if (field.value.trim() === '') field.value = '0';
       });
 
       field.addEventListener('input', () => {
-        // Удаляем всё, кроме цифр и точки
         field.value = field.value.replace(/[^0-9.]/g, '');
-        // Запрещаем более одной точки
         if ((field.value.match(/\./g) || []).length > 1) {
           field.value = field.value.slice(0, -1);
         }
       });
-    },
-
-    _handleSubmit() {
-      const name = document.getElementById('item-name').value.trim();
-      const unit = document.getElementById('item-unit').value.trim();
-      const qtyStr = document.getElementById('item-qty').value.trim();
-      const priceStr = document.getElementById('item-price').value.trim();
-      const errorDiv = document.getElementById('form-error');
-
-      const qty = parseFloat(qtyStr);
-      const price = parseFloat(priceStr);
-
-      // Сброс ошибки
-      errorDiv.textContent = '';
-
-      if (!name) {
-        errorDiv.textContent = 'Введите название';
-        return;
-      }
-      if (!unit) {
-        errorDiv.textContent = 'Введите единицу измерения';
-        return;
-      }
-      if (isNaN(qty) || qty <= 0) {
-        errorDiv.textContent = 'Количество должно быть больше 0';
-        return;
-      }
-      if (isNaN(price) || price <= 0) {
-        errorDiv.textContent = 'Цена должна быть больше 0';
-        return;
-      }
-
-      EstimatorActions.addItem({
-        name: name,
-        unit: unit,
-        quantity: qty,
-        price: price
-      });
-
-      // Очистка полей
-      document.getElementById('item-name').value = '';
-      document.getElementById('item-unit').value = '';
-      document.getElementById('item-qty').value = '0';
-      document.getElementById('item-price').value = '0';
     }
   };
 

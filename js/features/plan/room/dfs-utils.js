@@ -4,12 +4,20 @@
  * DFSUtils — вспомогательные функции для DetectRoom
  * linesSharePoint, isClosed, getCenter, findAnyCycle, buildPath
  * findAnyCycle — многостартовый обход, не требует всех линий
+ * Добавлен допуск 20px при сравнении точек (_pointsClose)
  */
 
 try {
   const DFSUtils = {
     pointKey(x, y) {
       return `${x},${y}`;
+    },
+
+    /**
+     * Проверка двух точек на близость с допуском tolerance (по каждой оси)
+     */
+    _pointsClose(x1, y1, x2, y2, tolerance = 20) {
+      return Math.abs(x1 - x2) <= tolerance && Math.abs(y1 - y2) <= tolerance;
     },
 
     linesSharePoint(a, b) {
@@ -23,24 +31,23 @@ try {
       if (walls.length < 3) return false;
       const first = walls[0];
       const last = walls[walls.length - 1];
-
       if (walls.length === 1) return false;
 
       const prev = walls[walls.length - 2];
       let lastOutX, lastOutY;
 
-      if (last.x1 === prev.x1 && last.y1 === prev.y1) {
+      if (this._pointsClose(last.x1, last.y1, prev.x1, prev.y1)) {
         lastOutX = last.x2; lastOutY = last.y2;
-      } else if (last.x1 === prev.x2 && last.y1 === prev.y2) {
+      } else if (this._pointsClose(last.x1, last.y1, prev.x2, prev.y2)) {
         lastOutX = last.x2; lastOutY = last.y2;
-      } else if (last.x2 === prev.x1 && last.y2 === prev.y1) {
+      } else if (this._pointsClose(last.x2, last.y2, prev.x1, prev.y1)) {
         lastOutX = last.x1; lastOutY = last.y1;
       } else {
         lastOutX = last.x1; lastOutY = last.y1;
       }
 
-      return (lastOutX === first.x1 && lastOutY === first.y1) ||
-             (lastOutX === first.x2 && lastOutY === first.y2);
+      return this._pointsClose(lastOutX, lastOutY, first.x1, first.y1) ||
+             this._pointsClose(lastOutX, lastOutY, first.x2, first.y2);
     },
 
     getCenter(walls) {
@@ -95,12 +102,12 @@ try {
       let currentY = outY;
 
       while (true) {
-        // Ищем линию, которая соединяется с текущей точкой
+        // Ищем линию, которая соединяется с текущей точкой (с допуском)
         let found = null;
         for (const line of allLines) {
           if (used.has(line)) continue;
-          if ((line.x1 === currentX && line.y1 === currentY) ||
-              (line.x2 === currentX && line.y2 === currentY)) {
+          if (this._pointsClose(line.x1, line.y1, currentX, currentY) ||
+              this._pointsClose(line.x2, line.y2, currentX, currentY)) {
             found = line;
             break;
           }
@@ -111,8 +118,8 @@ try {
         path.push(found);
         used.add(found);
 
-        // Определяем следующий выходной конец
-        if (found.x1 === currentX && found.y1 === currentY) {
+        // Определяем следующий выходной конец (противоположный тому, что совпал)
+        if (this._pointsClose(found.x1, found.y1, currentX, currentY)) {
           currentX = found.x2;
           currentY = found.y2;
         } else {
@@ -120,13 +127,13 @@ try {
           currentY = found.y1;
         }
 
-        // Проверяем замыкание на начало стартовой линии
+        // Проверяем замыкание на начало стартовой линии (с допуском)
         if (path.length >= 3 &&
-            currentX === startLine.x1 && currentY === startLine.y1) {
+            this._pointsClose(currentX, currentY, startLine.x1, startLine.y1)) {
           return path;
         }
         if (path.length >= 3 &&
-            currentX === startLine.x2 && currentY === startLine.y2) {
+            this._pointsClose(currentX, currentY, startLine.x2, startLine.y2)) {
           return path;
         }
       }

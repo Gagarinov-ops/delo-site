@@ -1,4 +1,4 @@
-// [AP-005] Единое состояние, 90 строк
+// [AP-005] Единое состояние, с поддержкой SET_PLAN
 import { events } from './events.js';
 
 class Store {
@@ -15,6 +15,7 @@ class Store {
       currentProjectId: null,
       theme: 'light',
       features: {},
+      plan: { rooms: [] } // инициализация плана
     };
     this._loadFromStorage();
     this._loadGuestSession();
@@ -47,6 +48,7 @@ class Store {
         break;
       }
       case 'ADD_CONSENT': this.state.user.consents.push({ ...payload, timestamp: new Date().toISOString() }); break;
+      case 'SET_PLAN': this.state.plan = payload; break;
     }
     this._saveToStorage();
     events.emit('stateChanged', { action, payload });
