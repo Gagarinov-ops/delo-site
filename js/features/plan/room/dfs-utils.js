@@ -4,7 +4,7 @@
  * DFSUtils — вспомогательные функции для DetectRoom
  * linesSharePoint, isClosed, getCenter, findAnyCycle, buildPath
  * findAnyCycle — многостартовый обход, не требует всех линий
- * Добавлен допуск 20px при сравнении точек (_pointsClose)
+ * Допуск при сравнении точек — 0 (точное совпадение)
  */
 
 try {
@@ -14,9 +14,9 @@ try {
     },
 
     /**
-     * Проверка двух точек на близость с допуском tolerance (по каждой оси)
+     * Проверка двух точек на точное совпадение (допуск 0)
      */
-    _pointsClose(x1, y1, x2, y2, tolerance = 20) {
+    _pointsClose(x1, y1, x2, y2, tolerance = 0) {
       return Math.abs(x1 - x2) <= tolerance && Math.abs(y1 - y2) <= tolerance;
     },
 
@@ -102,7 +102,7 @@ try {
       let currentY = outY;
 
       while (true) {
-        // Ищем линию, которая соединяется с текущей точкой (с допуском)
+        // Ищем линию, которая соединяется с текущей точкой (точное совпадение)
         let found = null;
         for (const line of allLines) {
           if (used.has(line)) continue;
@@ -127,7 +127,7 @@ try {
           currentY = found.y1;
         }
 
-        // Проверяем замыкание на начало стартовой линии (с допуском)
+        // Проверяем замыкание на начало стартовой линии (точное совпадение)
         if (path.length >= 3 &&
             this._pointsClose(currentX, currentY, startLine.x1, startLine.y1)) {
           return path;

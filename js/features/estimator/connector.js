@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * EstimatorConnector — подхватывает данные из store.plan
- * и автоматически заполняет смету позициями стен комнат.
+ * EstimatorConnector — подхватывает итоговые площади из store.plan
+ * и добавляет в смету две строки: стены и пол.
  * Если план не создан — смета остаётся пустой, без ошибок.
  */
 
@@ -10,13 +10,12 @@ try {
   const EstimatorConnector = {
     _initialized: false,
     _retries: 0,
-    _maxRetries: 20,   // попыток с интервалом ~300мс
+    _maxRetries: 20,
     _intervalMs: 300,
 
     init() {
       if (this._initialized) return;
 
-      // ждём, пока store будет готов (модуль app.js может грузиться позже)
       if (!window.App || !window.App.store) {
         if (++this._retries > this._maxRetries) {
           console.warn('[EstimatorConnector] store не появился');
@@ -30,28 +29,45 @@ try {
       const plan = state.plan;
       if (!plan || !plan.rooms || !plan.rooms.length) {
         this._initialized = true;
-        return; // плана нет — просто остаёмся пустыми
+        return;
       }
 
       const rooms = plan.rooms;
-      rooms.forEach((room, roomIdx) => {
-        const roomName = room.label || 'Комната ' + (roomIdx + 1);
+      let totalWallArea = 0;
+      let totalFloorArea = 0;
 
-        room.walls.forEach(wall => {
-          // wall уже содержит lengthM и area из plan.js
-          const area = wall.area || 0;
-          EstimatorActions.addItem({
-            name: `Стена ${wall.name} (${roomName})`,
-            unit: 'м²',
-            quantity: area,
-            price: 0,
-            category: roomName
-          });
+      rooms.forEach(room => {
+        room.walls.forEach(w => {
+          totalWallArea += w.area || 0;
         });
+        if (room.walls.length >= 2) {
+          const lenA = room.walls[0].lengthM || 0;
+          const lenB = room.walls[1].lengthM || 0;
+          totalFloorArea += lenA * lenB;
+        }
       });
 
+      if (totalWallArea > 0) {
+        EstimatorActions.addItem({
+          name: 'Оштукатуривание стен',
+          unit: 'м²',
+          quantity: Math.round(totalWallArea * 100) / 100,
+          price: 0,
+          category: 'Отделка стен'
+        });
+      }
+      if (totalFloorArea > 0) {
+        EstimatorActions.addItem({
+          name: 'Укладка плитки на пол',
+          unit: 'м²',
+          quantity: Math.round(totalFloorArea * 100) / 100,
+          price: 0,
+          category: 'Отделка пола'
+        });
+      }
+
       this._initialized = true;
-      EstimatorTable.render(); // на всякий случай принудительно
+      EstimatorTable.render();
       if (typeof EstimatorSummary !== 'undefined') EstimatorSummary.render();
     }
   };

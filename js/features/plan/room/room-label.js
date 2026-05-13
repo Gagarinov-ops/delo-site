@@ -1,8 +1,8 @@
 'use strict';
 
 /**
- * RoomLabel — поле ввода названия комнаты (не перекрывается)
- * После замыкания контура показывает поле, сохраняет имя в комнату и store.plan
+ * RoomLabel — поле ввода названия комнаты (всегда видимо после создания комнаты)
+ * Сохраняет имя по Enter, не скрывается автоматически.
  */
 
 try {
@@ -20,9 +20,11 @@ try {
       input.placeholder = 'Название комнаты';
       input.style.width = '200px';
       input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') { e.preventDefault(); this.save(); }
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          this.save();
+        }
       });
-      input.addEventListener('blur', () => this.save());
       container.appendChild(input);
     },
 
@@ -44,13 +46,11 @@ try {
 
       const name = input.value.trim() || 'Новая комната';
 
-      // обновляем в TetrisState
       const room = TetrisState.shapes.find(s => s.type === 'room' && s.contourId === this._currentRoomId);
       if (room) {
         room.label = name;
       }
 
-      // обновляем в store.plan (если доступно)
       if (window.App && window.App.store) {
         const state = window.App.store.getState();
         if (state.plan && state.plan.rooms) {
@@ -60,13 +60,10 @@ try {
         }
       }
 
-      // скрываем поле
-      const container = document.getElementById('room-label-container');
-      if (container) container.style.display = 'none';
-      this._currentRoomId = null;
-
       Grid.draw();
       Render.drawAll();
+
+      if (typeof InfoBox !== 'undefined') InfoBox.update();
     }
   };
 

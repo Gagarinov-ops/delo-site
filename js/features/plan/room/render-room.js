@@ -3,6 +3,7 @@
 /**
  * RenderRoom — отрисовка комнат на canvas
  * Заливка, стены, подписи
+ * Если у стены задана реальная длина — отображается в подписи
  */
 
 try {
@@ -81,7 +82,12 @@ try {
         const nx = -dy / len * 10;
         const ny = dx / len * 10;
 
-        ctx.fillText(wall.name, midX + nx, midY + ny);
+        let label = wall.name;
+        if (wall.realLength) {
+          label += ' (' + parseFloat(wall.realLength).toFixed(1) + ' м)';
+        }
+
+        ctx.fillText(label, midX + nx, midY + ny);
       });
 
       if (room.center && room.label) {

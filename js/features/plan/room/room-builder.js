@@ -6,6 +6,7 @@
  * Удаляет линии контура из shapes, добавляет комнату, пишет в history
  * Вызывает RoomLabel.show(contourId) для ввода названия
  * Сохраняет joints в GeometryState для геометрического ядра
+ * Вызывает InfoBox.update() при создании комнаты
  */
 
 try {
@@ -70,6 +71,9 @@ try {
       Grid.draw();
       Render.drawAll();
       Toolbar.updateUndoButton();
+
+      // Обновляем инженерное окошко
+      if (typeof InfoBox !== 'undefined') InfoBox.update();
 
       // Показать поле ввода названия комнаты (используем RoomLabel)
       if (typeof RoomLabel !== 'undefined') {
