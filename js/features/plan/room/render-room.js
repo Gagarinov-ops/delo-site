@@ -2,7 +2,7 @@
 
 /**
  * RenderRoom — отрисовка комнат на canvas
- * Заливка, стены, подписи
+ * Заливка, стены, подписи, двери
  * Если у стены задана реальная длина — отображается в подписи
  */
 
@@ -60,6 +60,43 @@ try {
         ctx.lineTo(wall.x2, wall.y2);
         ctx.stroke();
       });
+
+      // Рисуем двери
+      if (room.doors) {
+        room.doors.forEach(door => {
+          this._drawDoor(ctx, door, room.walls[door.wall]);
+        });
+      }
+    },
+
+    _drawDoor(ctx, door, wall) {
+      if (!wall) return;
+
+      const dx = wall.x2 - wall.x1;
+      const dy = wall.y2 - wall.y1;
+      const len = Math.hypot(dx, dy);
+      if (len === 0) return;
+
+      // Единичный вектор направления стены
+      const ux = dx / len;
+      const uy = dy / len;
+
+      // Жёсткий визуальный размер: 2 клетки (40 px)
+      const doorWidthPx = 40;
+      // Толщина двери фиксированная — 1 клетка (20 px)
+      const doorThickness = 20;
+
+      // Центр двери на стене (offset в сантиметрах)
+      const offsetPx = door.offset * 2;
+      const centerX = wall.x1 + ux * offsetPx;
+      const centerY = wall.y1 + uy * offsetPx;
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(Math.atan2(dy, dx));
+      ctx.fillStyle = '#444444';
+      ctx.fillRect(-doorWidthPx / 2, -doorThickness / 2, doorWidthPx, doorThickness);
+      ctx.restore();
     },
 
     drawLabels(ctx, room) {
