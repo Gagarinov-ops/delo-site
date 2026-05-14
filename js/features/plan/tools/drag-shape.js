@@ -1,9 +1,9 @@
 'use strict';
 
 /**
- * DragShape — модуль перетаскивания фигур
+ * DragShape — модуль перетаскивания фигур и размещения элементов
  * Получает события от input-dispatcher.js при активном инструменте «Курсор»
- * selectShape / startDrag / moveDrag / endDrag
+ * selectShape / startDrag / moveDrag / endDrag / placeElement
  */
 
 try {
@@ -35,7 +35,7 @@ try {
     },
 
     /**
-     * Начать перетаскивание
+     * Начать перетаскивание линии
      */
     startDrag(shape, pointerX, pointerY) {
       this.isDragging = true;
@@ -100,6 +100,67 @@ try {
       Grid.draw();
       Render.drawAll();
       Toolbar.updateUndoButton();
+    },
+
+    /**
+     * Разместить элемент (door-block / window-block) на ближайшей стене
+     * @param {string} elementType - 'door-block' или 'window-block'
+     * @param {number} x - координата X на canvas
+     * @param {number} y - координата Y на canvas
+     * @returns {boolean} успешно ли размещён элемент
+     */
+    placeElement(elementType, x, y) {
+      if (elementType !== 'door-block' && elementType !== 'window-block') return false;
+
+      const threshold = 20;                    // px
+      const step = getCellSize('cm');          // 20px
+      const rooms = TetrisState.shapes.filter(s => s.type === 'room');
+      let bestWall = null, bestDist = Infinity;
+
+      for (const room of rooms) {
+        for (const w of room.walls) {
+          const d = CanvasUtils.distToSegment(x, y, w.x1, w.y1, w.x2, w.y2);
+          if (d < bestDist && d <= threshold) {
+            bestDist = d;
+            bestWall = w;
+          }
+        }
+      }
+
+      if (bestWall) {
+        const midX = (bestWall.x1 + bestWall.x2) / 2;
+        const midY = (bestWall.y1 + bestWall.y2) / 2;
+        const dx = bestWall.x2 - bestWall.x1;
+        const dy = bestWall.y2 - bestWall.y1;
+        const len = Math.hypot(dx, dy);
+        const angle = Math.atan2(dy, dx);
+        const width = elementType === 'door-block' ? 2 * step : 2 * step;   // 2 клетки
+        const height = elementType === 'door-block' ? 1 * step : 0.5 * step; // 1 или 0.5 клетки
+
+        let posX = midX, posY = midY;
+        if (elementType === 'window-block') {
+          // смещаем наружу на 0.5 клетки
+          const nx = -dy / len;
+          const ny = dx / len;
+          posX = midX + nx * 10;
+          posY = midY + ny * 10;
+        }
+
+        const newObj = {
+          type: elementType,
+          x: posX,
+          y: posY,
+          angle,
+          width,
+          height
+        };
+
+        TetrisState.shapes.push(newObj);
+        Grid.draw();
+        Render.drawAll();
+        return true;
+      }
+      return false;
     }
   };
 

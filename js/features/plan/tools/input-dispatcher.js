@@ -4,6 +4,7 @@
  * InputDispatcher — единая точка входа для событий canvas
  * Принимает pointerdown/pointermove/pointerup
  * Диспетчеризует события по активному инструменту
+ * Добавлена обработка element (дверь, окно) — размещение через Door.place / Window.place
  */
 
 try {
@@ -42,6 +43,10 @@ try {
           } else {
             this._tryEditWall(coords);
           }
+          break;
+        case 'element':
+          e.preventDefault();
+          this._placeElement(e);
           break;
         default:
           break;
@@ -90,6 +95,54 @@ try {
           if (d <= threshold) {
             WallInput.show(shape, wall, i);
             return;
+          }
+        }
+      }
+    },
+
+    _placeElement(e) {
+      const coords = CanvasUtils.getCanvasCoords(e);
+      const element = Toolbar.currentElement;
+      if (!element) return;
+
+      if (element.type === 'door-block' || element.type === 'window-block') {
+        const threshold = 20;
+        const rooms = TetrisState.shapes.filter(s => s.type === 'room');
+        let bestWall = null, bestRoom = null, bestIndex = -1, bestDist = Infinity, bestOffsetPx = 0;
+
+        for (const room of rooms) {
+          for (let i = 0; i < room.walls.length; i++) {
+            const w = room.walls[i];
+            const d = CanvasUtils.distToSegment(coords.x, coords.y, w.x1, w.y1, w.x2, w.y2);
+            if (d < bestDist && d <= threshold) {
+              bestDist = d;
+              bestWall = w;
+              bestRoom = room;
+              bestIndex = i;
+              // вычисляем проекцию точки на стену для offset
+              const dx = w.x2 - w.x1, dy = w.y2 - w.y1;
+              const len = Math.hypot(dx, dy);
+              if (len > 0) {
+                const t = ((coords.x - w.x1) * dx + (coords.y - w.y1) * dy) / (len * len);
+                const clampedT = Math.max(0, Math.min(1, t));
+                bestOffsetPx = clampedT * len; // пиксели
+              }
+            }
+          }
+        }
+
+        if (bestRoom && bestWall) {
+          const offsetCm = Math.round(bestOffsetPx / 2); // переводим в см (1 см = 2 px)
+          const roomIndex = TetrisState.shapes.indexOf(bestRoom);
+          if (element.type === 'door-block') {
+            Door.place(roomIndex, bestIndex, offsetCm);
+          } else if (element.type === 'window-block') {
+            // Window.place принимает windowType = 0 (стандартное окно)
+            if (typeof Window !== 'undefined') {
+              Window.place(roomIndex, bestIndex, 0, offsetCm);
+            } else {
+              console.warn('Window.place не найден');
+            }
           }
         }
       }

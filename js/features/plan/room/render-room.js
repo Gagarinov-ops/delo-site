@@ -2,7 +2,7 @@
 
 /**
  * RenderRoom — отрисовка комнат на canvas
- * Заливка, стены, подписи, двери
+ * Заливка, стены, подписи, двери, окна
  * Если у стены задана реальная длина — отображается в подписи
  */
 
@@ -67,6 +67,13 @@ try {
           this._drawDoor(ctx, door, room.walls[door.wall]);
         });
       }
+
+      // Рисуем окна
+      if (room.windows) {
+        room.windows.forEach(win => {
+          this._drawWindow(ctx, win, room.walls[win.wall]);
+        });
+      }
     },
 
     _drawDoor(ctx, door, wall) {
@@ -77,7 +84,6 @@ try {
       const len = Math.hypot(dx, dy);
       if (len === 0) return;
 
-      // Единичный вектор направления стены
       const ux = dx / len;
       const uy = dy / len;
 
@@ -96,6 +102,33 @@ try {
       ctx.rotate(Math.atan2(dy, dx));
       ctx.fillStyle = '#444444';
       ctx.fillRect(-doorWidthPx / 2, -doorThickness / 2, doorWidthPx, doorThickness);
+      ctx.restore();
+    },
+
+    _drawWindow(ctx, win, wall) {
+      if (!wall) return;
+
+      const dx = wall.x2 - wall.x1;
+      const dy = wall.y2 - wall.y1;
+      const len = Math.hypot(dx, dy);
+      if (len === 0) return;
+
+      const midX = (wall.x1 + wall.x2) / 2;
+      const midY = (wall.y1 + wall.y2) / 2;
+      const nx = -dy / len;
+      const ny = dx / len;
+      const offsetPx = 10; // 0.5 клетки наружу
+      const centerX = midX + nx * offsetPx;
+      const centerY = midY + ny * offsetPx;
+
+      const windowWidthPx = 40; // 2 клетки
+      const windowThickness = 10; // 0.5 клетки
+
+      ctx.save();
+      ctx.translate(centerX, centerY);
+      ctx.rotate(Math.atan2(dy, dx));
+      ctx.fillStyle = '#888888';
+      ctx.fillRect(-windowWidthPx / 2, -windowThickness / 2, windowWidthPx, windowThickness);
       ctx.restore();
     },
 

@@ -31,5 +31,9 @@ const Door = {
     });
 
     console.log('Дверь установлена: стена ' + wallIndex + ', offset ' + offset + ' см');
+
+    // Автоматическая перерисовка
+    Grid.draw();
+    Render.drawAll();
   }
 };

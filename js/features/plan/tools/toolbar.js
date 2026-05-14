@@ -5,6 +5,7 @@
  * Кнопки: Курсор, Линия, Элементы, Отменить
  * Панель элементов генерируется из ElementLibrary
  * Сохраняет активный инструмент в delo_activeTool
+ * При выборе элемента устанавливается activeTool = 'element'
  */
 
 try {
@@ -14,6 +15,7 @@ try {
       { id: 'line', label: '📏 Линия' }
     ],
     activeTool: null,
+    currentElement: null,
     elementsVisible: false,
 
     init() {
@@ -23,7 +25,6 @@ try {
     render() {
       const panel = document.querySelector('.tools-panel');
       if (!panel) return;
-
       panel.innerHTML = '';
 
       // Кнопки инструментов
@@ -34,11 +35,7 @@ try {
         btn.textContent = tool.label;
         btn.dataset.tool = tool.id;
         btn.setAttribute('aria-pressed', tool.id === this.activeTool ? 'true' : 'false');
-
-        if (tool.id === this.activeTool) {
-          btn.classList.add('active');
-        }
-
+        if (tool.id === this.activeTool) btn.classList.add('active');
         btn.addEventListener('click', () => this.setTool(tool.id));
         panel.appendChild(btn);
       });
@@ -47,18 +44,17 @@ try {
       const elemBtn = document.createElement('button');
       elemBtn.type = 'button';
       elemBtn.className = 'tool-btn elements-toggle';
+      if (this.activeTool === 'element') elemBtn.classList.add('active');
       elemBtn.textContent = '📦 Элементы';
       elemBtn.setAttribute('aria-expanded', this.elementsVisible ? 'true' : 'false');
       elemBtn.addEventListener('click', () => this.toggleElements());
       panel.appendChild(elemBtn);
 
-      // Разделитель
       const sep = document.createElement('span');
       sep.className = 'tool-separator';
       sep.textContent = '|';
       panel.appendChild(sep);
 
-      // Кнопка Отменить
       const undoBtn = document.createElement('button');
       undoBtn.type = 'button';
       undoBtn.className = 'tool-btn undo-btn';
@@ -68,10 +64,7 @@ try {
       undoBtn.addEventListener('click', () => this.undo());
       panel.appendChild(undoBtn);
 
-      // Панель элементов (если открыта)
-      if (this.elementsVisible) {
-        this.renderElementsPanel();
-      }
+      if (this.elementsVisible) this.renderElementsPanel();
 
       this.updateUndoButton();
     },
@@ -94,6 +87,9 @@ try {
         btn.className = 'tool-btn element-btn';
         btn.textContent = item.icon + ' ' + item.label;
         btn.dataset.elementType = item.type;
+        if (this.activeTool === 'element' && this.currentElement && this.currentElement.type === item.type) {
+          btn.classList.add('active');
+        }
         btn.addEventListener('click', () => this.selectElement(item));
         wrapper.appendChild(btn);
       });
@@ -102,11 +98,17 @@ try {
     },
 
     selectElement(item) {
+      this.activeTool = 'element';
+      this.currentElement = item;
       this.elementsVisible = false;
       this.render();
     },
 
     setTool(toolId) {
+      if (this.activeTool === 'element') {
+        this.currentElement = null;
+        this.activeTool = null;
+      }
       if (this.activeTool === toolId) {
         this.activeTool = null;
       } else {
@@ -126,9 +128,7 @@ try {
 
     updateUndoButton() {
       const btn = document.getElementById('undo-btn');
-      if (btn) {
-        btn.disabled = TetrisState.history.length === 0;
-      }
+      if (btn) btn.disabled = TetrisState.history.length === 0;
     }
   };
 
