@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Тест зума и панорамирования (чистый)</title>
+  <style>
+    html, body { margin:0; padding:0; overscroll-behavior: none; touch-action: none; }
+    canvas { display: block; touch-action: none; overscroll-behavior: none; cursor: default; }
+    .toolbar { position:fixed; bottom:10px; left:10px; background:white; padding:5px; border-radius:4px; z-index:100; }
+    button { margin:2px; }
+  </style>
+</head>
+<body>
+  <canvas id="mainCanvas" width="1000" height="700"></canvas>
+  <div class="toolbar">
+    <button id="btnResetCamera">Сбросить камеру</button>
+    <button id="btnPoint">Создать точку (100,200)</button>
+    <button id="btnWall">Создать стену (100,200)-(400,250)</button>
+    <button id="btnRoom">Создать тестовую комнату (квадрат 3000x2000)</button>
+    <button id="btnResetData">Сбросить данные</button>
+  </div>
+
+  <script src="js/constants.js"></script>
+  <script src="js/canvas-data.js"></script>
+  <script src="js/calculator.js"></script>
+  <script src="js/geometry-validator.js"></script>
+  <script src="js/registry.js"></script>
+  <script src="js/bridge.js"></script>
+  <script src="js/toast.js"></script>
+  <script src="js/canvas-renderer.js"></script>
+
+  <script>
+    const canvas = document.getElementById('mainCanvas');
+    CanvasData._upgradeWalls(); // на случай старых данных
+    initCanvas(canvas);
+
+    document.getElementById('btnResetCamera').addEventListener('click', () => resetCamera(canvas));
+    document.getElementById('btnPoint').addEventListener('click', () => {
+      const res = registerPoint(100, 200);
+      console.log(res);
+      renderCanvas(canvas);
+    });
+    document.getElementById('btnWall').addEventListener('click', () => {
+      // создадим точки, если их нет
+      let p1 = null, p2 = null;
+      for (let pid in CanvasData.points) {
+        const p = CanvasData.points[pid];
+        if (p.x === 100 && p.y === 200) p1 = pid;
+        if (p.x === 400 && p.y === 250) p2 = pid;
+      }
+      if (!p1) { const r1 = registerPoint(100,200); if(r1.success) p1 = r1.data.pointId; }
+      if (!p2) { const r2 = registerPoint(400,250); if(r2.success) p2 = r2.data.pointId; }
+      if (p1 && p2) {
+        const res = registerWall(p1, p2);
+        console.log(res);
+        renderCanvas(canvas);
+      }
+    });
+    document.getElementById('btnRoom').addEventListener('click', () => {
+      CanvasData.reset();
+      const p1 = registerPoint(0,0).data.pointId;
+      const p2 = registerPoint(3000,0).data.pointId;
+      const p3 = registerPoint(3000,2000).data.pointId;
+      const p4 = registerPoint(0,2000).data.pointId;
+      const w1 = registerWall(p1,p2).data.wallId;
+      const w2 = registerWall(p2,p3).data.wallId;
+      const w3 = registerWall(p3,p4).data.wallId;
+      const w4 = registerWall(p4,p1).data.wallId;
+      const res = registerRoom([p1,p2,p3,p4], [w1,w2,w3,w4], 2500);
+      console.log(res);
+      renderCanvas(canvas);
+    });
+    document.getElementById('btnResetData').addEventListener('click', () => {
+      CanvasData.reset();
+      renderCanvas(canvas);
+      console.log('Данные сброшены');
+    });
+  </script>
+</body>
+</html>
