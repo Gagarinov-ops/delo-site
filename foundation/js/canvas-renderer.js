@@ -50,24 +50,24 @@ function drawAdaptiveGrid(ctx, cam) {
   if(z<0.4) alpha10=1;  
   else if(z<0.8) { const t=(z-0.4)/0.4; alpha10=1-t; alpha5=t; }  
   else { const t=(z-0.8)/(CONFIG.MAX_ZOOM-0.8); alpha5=1-t; alpha1=t; }  
+  ctx.save();  
+  ctx.strokeStyle = CONFIG.GRID_COLOR;  
   if(alpha10>0) {  
-    ctx.save(); ctx.globalAlpha=alpha10; ctx.strokeStyle=CONFIG.COLOR_MAJOR; ctx.lineWidth=1/cam.zoom;  
+    ctx.globalAlpha = alpha10; ctx.lineWidth = 1/cam.zoom;  
     for(let x=0;x<=12000;x+=10) { ctx.beginPath(); ctx.moveTo(x,-2000); ctx.lineTo(x,4000); ctx.stroke(); }  
     for(let y=-2000;y<=4000;y+=10) { ctx.beginPath(); ctx.moveTo(-2000,y); ctx.lineTo(12000,y); ctx.stroke(); }  
-    ctx.restore();  
   }  
   if(alpha5>0) {  
-    ctx.save(); ctx.globalAlpha=alpha5; ctx.strokeStyle=CONFIG.COLOR_MINOR; ctx.lineWidth=0.8/cam.zoom;  
+    ctx.globalAlpha = alpha5; ctx.lineWidth = 0.8/cam.zoom;  
     for(let x=0;x<=12000;x+=5) if(x%10!==0) { ctx.beginPath(); ctx.moveTo(x,-2000); ctx.lineTo(x,4000); ctx.stroke(); }  
     for(let y=-2000;y<=4000;y+=5) if(y%10!==0) { ctx.beginPath(); ctx.moveTo(-2000,y); ctx.lineTo(12000,y); ctx.stroke(); }  
-    ctx.restore();  
   }  
   if(alpha1>0) {  
-    ctx.save(); ctx.globalAlpha=alpha1; ctx.strokeStyle="#b0b0b0"; ctx.lineWidth=0.4/cam.zoom;  
+    ctx.globalAlpha = alpha1; ctx.lineWidth = 0.4/cam.zoom;  
     for(let x=0;x<=12000;x+=1) if(x%5!==0) { ctx.beginPath(); ctx.moveTo(x,-2000); ctx.lineTo(x,4000); ctx.stroke(); }  
     for(let y=-2000;y<=4000;y+=1) if(y%5!==0) { ctx.beginPath(); ctx.moveTo(-2000,y); ctx.lineTo(12000,y); ctx.stroke(); }  
-    ctx.restore();  
   }  
+  ctx.restore();  
 }  
 
 function showScaleIndicator() {  
@@ -89,27 +89,45 @@ function renderCanvas(canvas) {
   if(!canvas) return;  
   const ctx = canvas.getContext('2d');  
   const w = canvas.width, h = canvas.height;  
-  ctx.fillStyle = CONFIG.COLOR_BG; ctx.fillRect(0,0,w,h);  
-  ctx.save(); ctx.translate(w/2, h/2); ctx.scale(Camera.zoom, -Camera.zoom); ctx.translate(-Camera.panX, -Camera.panY);  
+  ctx.fillStyle = CONFIG.BACKGROUND_COLOR;  
+  ctx.fillRect(0,0,w,h);  
+  ctx.save();  
+  ctx.translate(w/2, h/2);  
+  ctx.scale(Camera.zoom, -Camera.zoom);  
+  ctx.translate(-Camera.panX, -Camera.panY);  
   drawAdaptiveGrid(ctx, Camera);  
-  for(const wid in CanvasData.walls) {  
-    const ww = CanvasData.walls[wid];  
-    const p1 = toScreen(ww.x1, ww.y1, canvas), p2 = toScreen(ww.x2, ww.y2, canvas);  
-    ctx.beginPath(); ctx.moveTo(p1.x, p1.y); ctx.lineTo(p2.x, p2.y);  
-    ctx.strokeStyle = '#333'; ctx.lineWidth = 2/Camera.zoom; ctx.stroke();  
+
+  // Стены  
+  ctx.strokeStyle = CONFIG.WALL_STROKE_COLOR;  
+  ctx.lineWidth = CONFIG.WALL_STROKE_WIDTH / Camera.zoom;  
+  for (const id in CanvasData.walls) {  
+    const ww = CanvasData.walls[id];  
+    ctx.beginPath();  
+    ctx.moveTo(ww.x1, ww.y1);  
+    ctx.lineTo(ww.x2, ww.y2);  
+    ctx.stroke();  
   }  
-  for(const pid in CanvasData.points) {  
-    const pt = CanvasData.points[pid];  
-    const s = toScreen(pt.x, pt.y, canvas);  
-    ctx.beginPath(); ctx.arc(s.x, s.y, 3/Camera.zoom, 0, 2*Math.PI);  
-    ctx.fillStyle = 'red'; ctx.fill();  
+
+  // Точки  
+  ctx.fillStyle = CONFIG.POINT_MARKER_FILL;  
+  ctx.strokeStyle = CONFIG.POINT_MARKER_STROKE;  
+  ctx.lineWidth = 1 / Camera.zoom;  
+  for (const id in CanvasData.points) {  
+    const p = CanvasData.points[id];  
+    ctx.beginPath();  
+    ctx.arc(p.x, p.y, CONFIG.POINT_MARKER_RADIUS / Camera.zoom, 0, Math.PI * 2);  
+    ctx.fill();  
+    ctx.stroke();  
   }  
+
   ctx.restore();  
 }  
 
 function initCanvas(canvas) {  
   if(!canvas) return;  
-  canvas.style.touchAction = 'none'; canvas.style.overscrollBehaviorX = 'none'; canvas.style.overscrollBehaviorY = 'none';  
+  canvas.style.touchAction = 'none';  
+  canvas.style.overscrollBehaviorX = 'none';  
+  canvas.style.overscrollBehaviorY = 'none';  
   document.body.addEventListener('wheel', (e) => { if(e.target === canvas) return; e.preventDefault(); }, { passive: false });  
   document.body.addEventListener('touchmove', (e) => { if(e.target === canvas) return; e.preventDefault(); }, { passive: false });  
 
@@ -125,26 +143,39 @@ function initCanvas(canvas) {
     const worldAfter = toWorld(screenX, screenY, canvas);  
     Camera.panX += worldBefore.x - worldAfter.x;  
     Camera.panY += worldBefore.y - worldAfter.y;  
-    applyPanLimits(canvas); renderCanvas(canvas); showScaleIndicator();  
+    applyPanLimits(canvas);  
+    renderCanvas(canvas);  
+    showScaleIndicator();  
   }, { passive: false });  
 
   let isPanning = false, lastPanX, lastPanY;  
   canvas.addEventListener('pointerdown', (e) => {  
-    e.preventDefault(); e.stopPropagation(); canvas.setPointerCapture(e.pointerId);  
-    isPanning = true; lastPanX = e.clientX; lastPanY = e.clientY;  
+    e.preventDefault(); e.stopPropagation();  
+    canvas.setPointerCapture(e.pointerId);  
+    isPanning = true;  
+    lastPanX = e.clientX;  
+    lastPanY = e.clientY;  
   });  
   canvas.addEventListener('pointermove', (e) => {  
     if(!isPanning) return;  
     e.preventDefault();  
     const dx = e.clientX - lastPanX, dy = e.clientY - lastPanY;  
-    lastPanX = e.clientX; lastPanY = e.clientY;  
-    Camera.panX -= dx / Camera.zoom; Camera.panY += dy / Camera.zoom;  
-    applyPanLimits(canvas); renderCanvas(canvas);  
+    lastPanX = e.clientX;  
+    lastPanY = e.clientY;  
+    Camera.panX -= dx / Camera.zoom;  
+    Camera.panY += dy / Camera.zoom;  
+    applyPanLimits(canvas);  
+    renderCanvas(canvas);  
   });  
-  canvas.addEventListener('pointerup', (e) => { isPanning = false; canvas.releasePointerCapture(e.pointerId); });  
+  canvas.addEventListener('pointerup', (e) => {  
+    isPanning = false;  
+    canvas.releasePointerCapture(e.pointerId);  
+  });  
   canvas.addEventListener('pointercancel', () => { isPanning = false; });  
   renderCanvas(canvas);  
 }  
 
-window.Camera = Camera; window.resetCamera = resetCamera; window.renderCanvas = renderCanvas;  
-window.initCanvas = initCanvas; window.toWorld = toWorld; window.toScreen = toScreen;  
+window.Camera = Camera;  
+window.resetCamera = resetCamera;  
+window.renderCanvas = renderCanvas;  
+window.initCanvas = initCanvas;  
