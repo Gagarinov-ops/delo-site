@@ -37,6 +37,22 @@ window.registerWall = function(pointStartId, pointEndId) {
   if (wall.length >= 6000 && wall.length <= CONFIG.MAX_WORLD_LIMIT) {  
     showToast("Длина стены превышает 6 метров. Чертёж на листе А4 будет мелким, но останется читаемым до 12 метров.", "warning");  
   }  
+
+  // Автоматическое создание комнат через GraphAnalyzer  
+  if (typeof GraphAnalyzer !== 'undefined') {  
+    const cycles = GraphAnalyzer.findAllCycles(pointStartId, CanvasData.points, CanvasData.walls);  
+    cycles.forEach(cycle => {  
+      // Проверка дубликатов комнат  
+      const exists = Object.values(CanvasData.rooms).some(room =>  
+        room.wallIds.length === cycle.wallIds.length &&  
+        cycle.wallIds.every(wid => room.wallIds.includes(wid))  
+      );  
+      if (!exists) {  
+        registerRoom(cycle.pointIds, cycle.wallIds);  
+      }  
+    });  
+  }  
+
   return { success: true, data: { wallId: id } };  
 };  
 
@@ -94,4 +110,4 @@ window.renameRoom = function(roomId, newName) {
   if (!CanvasData.rooms[roomId]) return { success: false };  
   CanvasData.rooms[roomId].name = newName;  
   return { success: true };  
-};  
+};  
