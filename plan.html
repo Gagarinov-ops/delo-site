@@ -1,0 +1,62 @@
+<!DOCTYPE html>  
+<html lang="ru">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">  
+    <title>Дело.Сайт — Редактор планов</title>  
+    <link rel="stylesheet" href="styles/main.css">  
+</head>  
+<body>  
+    <main>  
+        <canvas id="mainCanvas"></canvas>  
+        <canvas id="overlayCanvas"></canvas>  
+    </main>  
+
+    <header>  
+        <button id="backBtn" class="icon-btn">← Назад</button>  
+        <h1>Дело.Сайт — Редактор планов</h1>  
+        <button id="burgerBtn" class="icon-btn">☰</button>  
+        <div id="burgerMenu" class="dropdown-menu">  
+            <button class="menu-item">Личный кабинет</button>  
+            <button class="menu-item">Сохранить</button>  
+            <button class="menu-item">Экспорт в PDF</button>  
+        </div>  
+    </header>  
+
+    <nav id="toolbar">  
+        <button class="tool-btn">Курсор</button>  
+        <button class="tool-btn">Карандаш</button>  
+        <button class="tool-btn">Рулетка</button>  
+        <button class="tool-btn">Стёрка</button>  
+        <button class="tool-btn">UNDO</button>  
+        <div class="dropdown-wrapper">  
+            <button id="elementsBtn" class="tool-btn">Элементы ▼</button>  
+            <div id="elementsMenu" class="dropdown-menu">  
+                <button class="menu-item">Окно</button>  
+                <button class="menu-item">Дверь</button>  
+                <button class="menu-item">Круг</button>  
+                <button class="menu-item">Квадрат</button>  
+            </div>  
+        </div>  
+    </nav>  
+
+    <aside id="infoPanel">  
+        <dl>  
+            <dt>Название</dt>  
+            <dd>—</dd>  
+            <dt>Высота</dt>  
+            <dd>—</dd>  
+            <dt>Площадь пола</dt>  
+            <dd>—</dd>  
+            <dt>Площадь стен</dt>  
+            <dd>—</dd>  
+            <dt>Периметр</dt>  
+            <dd>—</dd>  
+        </dl>  
+    </aside>  
+
+    <div id="toast" class="toast-hidden">Уведомление</div>  
+
+    <script src="src/main.js" type="module"></script>  
+</body>  
+</html>  

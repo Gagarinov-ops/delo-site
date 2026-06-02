@@ -1,0 +1,189 @@
+*, *::before, *::after {  
+    margin: 0;  
+    padding: 0;  
+    box-sizing: border-box;  
+}  
+
+html, body {  
+    width: 100%;  
+    height: 100%;  
+    overflow: hidden;  
+    touch-action: none;  
+}  
+
+main {  
+    display: block;  
+    width: 100%;  
+    height: 100%;  
+}  
+
+canvas {  
+    position: fixed;  
+    top: 0;  
+    left: 0;  
+    width: 100vw;  
+    height: 100vh;  
+}  
+
+#mainCanvas {  
+    z-index: 0;  
+    background: white;  
+}  
+
+#overlayCanvas {  
+    z-index: 1;  
+    pointer-events: none;  
+}  
+
+header {  
+    position: fixed;  
+    top: 0;  
+    left: 0;  
+    width: 100%;  
+    height: 48px;  
+    z-index: 2;  
+    background: #FAFAFA;  
+    border-bottom: 1px solid #E0E0E0;  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    padding: 0 16px;  
+}  
+
+h1 {  
+    font-size: 18px;  
+    font-weight: 500;  
+    color: #333;  
+}  
+
+.icon-btn {  
+    background: transparent;  
+    border: none;  
+    font-size: 16px;  
+    cursor: pointer;  
+    padding: 8px 12px;  
+    border-radius: 6px;  
+}  
+
+.icon-btn:hover {  
+    background: rgba(0,0,0,0.05);  
+}  
+
+#toolbar {  
+    position: fixed;  
+    bottom: 0;  
+    left: 0;  
+    width: 100%;  
+    height: 60px;  
+    z-index: 2;  
+    background: #FAFAFA;  
+    border-top: 1px solid #E0E0E0;  
+    display: flex;  
+    align-items: center;  
+    justify-content: center;  
+    gap: 8px;  
+}  
+
+.tool-btn {  
+    background: #F0F0F0;  
+    border: 1px solid #CCC;  
+    padding: 8px 14px;  
+    border-radius: 8px;  
+    cursor: pointer;  
+    font-size: 14px;  
+}  
+
+.tool-btn:hover {  
+    background: #E0E0E0;  
+}  
+
+.dropdown-wrapper {  
+    position: relative;  
+}  
+
+.dropdown-menu {  
+    display: none;  
+    position: absolute;  
+    bottom: 100%;  
+    left: 0;  
+    background: white;  
+    border: 1px solid #CCC;  
+    border-radius: 8px;  
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);  
+    min-width: 160px;  
+    z-index: 20;  
+    margin-bottom: 4px;  
+}  
+
+.dropdown-menu.show {  
+    display: block;  
+}  
+
+.menu-item {  
+    display: block;  
+    width: 100%;  
+    padding: 10px 16px;  
+    background: none;  
+    border: none;  
+    text-align: left;  
+    cursor: pointer;  
+    font-size: 14px;  
+}  
+
+.menu-item:hover {  
+    background: #F5F5F5;  
+}  
+
+#infoPanel {  
+    position: fixed;  
+    top: 48px;  
+    right: 0;  
+    z-index: 2;  
+    padding: 16px 20px;  
+    pointer-events: none;  
+}  
+
+dl {  
+    pointer-events: auto;  
+}  
+
+dt {  
+    font-weight: 600;  
+    font-size: 12px;  
+    color: #555;  
+    margin-top: 10px;  
+}  
+
+dt:first-child {  
+    margin-top: 0;  
+}  
+
+dd {  
+    font-size: 12px;  
+    color: #000;  
+    margin-left: 0;  
+    margin-bottom: 10px;  
+    font-weight: 500;  
+}  
+
+#toast {  
+    position: fixed;  
+    top: 50%;  
+    left: 50%;  
+    transform: translate(-50%, -50%);  
+    z-index: 10;  
+    background: rgba(30, 30, 30, 0.85);  
+    color: #FFF;  
+    padding: 12px 28px;  
+    border-radius: 10px;  
+    font-size: 14px;  
+    text-align: center;  
+    max-width: 85vw;  
+    pointer-events: none;  
+    white-space: nowrap;  
+}  
+
+.toast-hidden {  
+    display: none;  
+}  
+
