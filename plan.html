@@ -13,9 +13,9 @@
     </main>  
 
     <header>  
-        <button id="backBtn" class="icon-btn">← Назад</button>  
-        <h1>Дело.Сайт — Редактор планов</h1>  
-        <button id="burgerBtn" class="icon-btn">☰</button>  
+        <button id="backBtn" class="icon-btn" aria-label="Назад">←</button>  
+        <h1>Дело.Сайт</h1>  
+        <button id="burgerBtn" class="icon-btn" aria-label="Меню">☰</button>  
         <div id="burgerMenu" class="dropdown-menu">  
             <button class="menu-item">Личный кабинет</button>  
             <button class="menu-item">Сохранить</button>  
@@ -24,13 +24,13 @@
     </header>  
 
     <nav id="toolbar">  
-        <button class="tool-btn">Курсор</button>  
-        <button class="tool-btn">Карандаш</button>  
-        <button class="tool-btn">Рулетка</button>  
-        <button class="tool-btn">Стёрка</button>  
-        <button class="tool-btn">UNDO</button>  
+        <button class="tool-btn">🖱️</button>  
+        <button class="tool-btn">✏️</button>  
+        <button class="tool-btn">📏</button>  
+        <button class="tool-btn">🧽</button>  
+        <button class="tool-btn">↩️</button>  
         <div class="dropdown-wrapper">  
-            <button id="elementsBtn" class="tool-btn">Элементы ▼</button>  
+            <button id="elementsBtn" class="tool-btn">📦 ▼</button>  
             <div id="elementsMenu" class="dropdown-menu">  
                 <button class="menu-item">Окно</button>  
                 <button class="menu-item">Дверь</button>  
@@ -42,16 +42,11 @@
 
     <aside id="infoPanel">  
         <dl>  
-            <dt>Название</dt>  
-            <dd>—</dd>  
-            <dt>Высота</dt>  
-            <dd>—</dd>  
-            <dt>Площадь пола</dt>  
-            <dd>—</dd>  
-            <dt>Площадь стен</dt>  
-            <dd>—</dd>  
-            <dt>Периметр</dt>  
-            <dd>—</dd>  
+            <div class="info-row"><dt class="info-label">Название</dt><dd class="info-value">—</dd></div>  
+            <div class="info-row"><dt class="info-label">Высота</dt><dd class="info-value">—</dd></div>  
+            <div class="info-row"><dt class="info-label">Площадь пола</dt><dd class="info-value">—</dd></div>  
+            <div class="info-row"><dt class="info-label">Площадь стен</dt><dd class="info-value">—</dd></div>  
+            <div class="info-row"><dt class="info-label">Периметр</dt><dd class="info-value">—</dd></div>  
         </dl>  
     </aside>  
 
