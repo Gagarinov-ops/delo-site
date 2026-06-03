@@ -3,12 +3,13 @@ import { Viewport } from '../viewport/Viewport.js';
 export class InputHandler {  
     constructor(updateCallback) {  
         this.viewport = Viewport.getInstance();  
-        this.updateCallback = updateCallback;  
+        this.onUpdate = updateCallback; // callback(type, data)  
         this.dragging = false;  
         this.lastX = 0;  
         this.lastY = 0;  
         this.pinchActive = false;  
         this.lastDist = 0;  
+        this.pinchZoomed = false;  
         this.initEvents();  
     }  
 
@@ -24,9 +25,13 @@ export class InputHandler {
 
     onWheel(e) {  
         e.preventDefault();  
-        const factor = e.deltaY < 0 ? 1.03 : 0.97;  
-        this.viewport.zoomAt(factor, e.clientX, e.clientY);  
-        this.updateCallback();  
+        if (e.deltaY < 0) {  
+            this.viewport.zoomIn();  
+        } else {  
+            this.viewport.zoomOut();  
+        }  
+        this.onUpdate('zoomChanged', { zoomLevel: this.viewport.currentZoomLevel });  
+        this.onUpdate('panChanged', this.viewport.getPan());  
     }  
 
     onPointerDown(e) {  
@@ -46,7 +51,7 @@ export class InputHandler {
                 this.viewport.pan(dx, dy);  
                 this.lastX = e.clientX;  
                 this.lastY = e.clientY;  
-                this.updateCallback();  
+                this.onUpdate('panChanged', this.viewport.getPan());  
             }  
         }  
     }  
@@ -62,6 +67,7 @@ export class InputHandler {
             e.preventDefault();  
             this.pinchActive = true;  
             this.dragging = false;  
+            this.pinchZoomed = false;  
             const dx = e.touches[0].clientX - e.touches[1].clientX;  
             const dy = e.touches[0].clientY - e.touches[1].clientY;  
             this.lastDist = Math.hypot(dx, dy);  
@@ -74,19 +80,27 @@ export class InputHandler {
             const dx = e.touches[0].clientX - e.touches[1].clientX;  
             const dy = e.touches[0].clientY - e.touches[1].clientY;  
             const newDist = Math.hypot(dx, dy);  
-            if (this.lastDist > 0) {  
-                const factor = newDist / this.lastDist;  
-                const centerX = (e.touches[0].clientX + e.touches[1].clientX) / 2;  
-                const centerY = (e.touches[0].clientY + e.touches[1].clientY) / 2;  
-                this.viewport.zoomAt(factor, centerX, centerY);  
-                this.updateCallback();  
+
+            if (!this.pinchZoomed) {  
+                if (newDist > this.lastDist * 1.2) {  
+                    this.viewport.zoomIn();  
+                    this.pinchZoomed = true;  
+                } else if (newDist < this.lastDist * 0.8) {  
+                    this.viewport.zoomOut();  
+                    this.pinchZoomed = true;  
+                }  
             }  
-            this.lastDist = newDist;  
+            if (this.pinchZoomed) {  
+                this.onUpdate('zoomChanged', { zoomLevel: this.viewport.currentZoomLevel });  
+                this.onUpdate('panChanged', this.viewport.getPan());  
+            }  
         }  
     }  
 
     onTouchEnd(e) {  
         this.pinchActive = false;  
+        this.pinchZoomed = false;  
         this.lastDist = 0;  
     }  
 }  
+

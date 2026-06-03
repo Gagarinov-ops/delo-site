@@ -1,4 +1,7 @@
+import { EventDispatcher } from './core/EventDispatcher.js';  
 import { Viewport } from './viewport/Viewport.js';  
+import { InputHandler } from './input/InputHandler.js';  
+import { setupGridLayers } from './ui/GridLayers.js';  
 
 // ---------- Логика меню (без изменений) ----------  
 function closeAllMenus() {  
@@ -60,8 +63,28 @@ document.querySelectorAll('.tool-btn:not(#elementsBtn)').forEach(btn => {
     });  
 });  
 
-// ---------- Логика Viewport и контейнера ----------  
+// ---------- Индикатор zoom ----------  
+function showZoomIndicator(zoomLevel) {  
+    const indicator = document.getElementById('zoomIndicator');  
+    if (!indicator) return;  
+    // Определяем шаг сетки для отображения (заглушка, потом будет браться из активного слоя)  
+    let gridStep = '5 мм';  
+    if (zoomLevel === 0) gridStep = '1 мм';  
+    else if (zoomLevel === 1) gridStep = '1/5 мм';  
+    else if (zoomLevel === 2) gridStep = '5 мм';  
+    else if (zoomLevel === 3) gridStep = '5/10 мм';  
+    else if (zoomLevel === 4) gridStep = '10 мм';  
+    indicator.innerHTML = `Zoom: ${zoomLevel + 1}<br>Сетка: ${gridStep}`;  
+    indicator.style.opacity = '1';  
+    clearTimeout(window._zoomIndicatorTimeout);  
+    window._zoomIndicatorTimeout = setTimeout(() => {  
+        indicator.style.opacity = '0';  
+    }, 2000);  
+}  
+
+// ---------- Логика Viewport, контейнера и диспетчера ----------  
 document.addEventListener('DOMContentLoaded', () => {  
+    const dispatcher = new EventDispatcher();  
     const viewport = Viewport.getInstance();  
     const container = document.getElementById('canvasContainer');  
     const mainCanvas = document.getElementById('mainCanvas');  
@@ -91,10 +114,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ctxOverlay) ctxOverlay.setTransform(dpr, 0, 0, dpr, 0, 0);  
     }  
 
-    // Инициализация InputHandler (импорт может быть уже вверху)  
-    import('./input/InputHandler.js').then(({ InputHandler }) => {  
-        new InputHandler(updateContainer);  
+    // InputHandler теперь вызывает колбэк с событиями  
+    const inputHandler = new InputHandler((type, data) => {  
+        updateContainer();  
+        dispatcher.emit(type, data);  
     });  
+
+    // Подписка на zoomChanged для индикатора  
+    dispatcher.on('zoomChanged', (data) => {  
+        showZoomIndicator(data.zoomLevel);  
+    });  
+
+    // Инициализация сетки  
+    setupGridLayers(dispatcher, viewport);  
 
     // Кнопка сброса  
     const resetBtn = document.getElementById('resetZoomButton');  
@@ -102,20 +134,32 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBtn.addEventListener('click', () => {  
             viewport.reset();  
             updateContainer();  
+            dispatcher.emit('zoomChanged', { zoomLevel: viewport.currentZoomLevel });  
+            dispatcher.emit('panChanged', viewport.getPan());  
         });  
     }  
 
+    // Ресайз окна  
     window.addEventListener('resize', () => {  
         viewport.updateProjection();  
         viewport.originalZoom = viewport.zoom;  
         viewport.originalPanX = viewport.panX;  
         viewport.originalPanY = viewport.panY;  
         updateContainer();  
+        dispatcher.emit('containerResized', {  
+            width: viewport.worldWidth * viewport.zoom,  
+            height: viewport.worldHeight * viewport.zoom,  
+            panX: viewport.panX,  
+            panY: viewport.panY  
+        });  
+        // При ресайзе пересчитываем сетку  
+        dispatcher.emit('zoomChanged', { zoomLevel: viewport.currentZoomLevel });  
     });  
 
     updateContainer();  
+    // Начальное событие зума для индикатора и сетки  
+    dispatcher.emit('zoomChanged', { zoomLevel: viewport.currentZoomLevel });  
 
     window.viewport = viewport;  
-    console.log('Квадратное рабочее поле 297×297 мм готово');  
+    console.log('EventDispatcher, слои сетки и индикатор готовы');  
 });  
-

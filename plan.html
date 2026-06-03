@@ -9,6 +9,12 @@
 <body>  
     <div id="canvasContainer">  
         <div id="canvasBackground"></div>  
+
+        <!-- Слои сетки -->  
+        <div id="gridLayerCoarse" class="grid-layer" data-step="10"></div>  
+        <div id="gridLayerMedium" class="grid-layer grid-layer--active" data-step="5"></div>  
+        <div id="gridLayerFine" class="grid-layer" data-step="1"></div>  
+
         <canvas id="mainCanvas"></canvas>  
         <canvas id="overlayCanvas"></canvas>  
     </div>  
@@ -53,10 +59,9 @@
 
     <div id="toast" class="toast-hidden">Уведомление</div>  
 
-    <!-- Кнопка сброса -->  
     <button id="resetZoomButton">Сброс</button>  
+    <div id="zoomIndicator"></div>  
 
     <script src="src/main.js" type="module"></script>  
 </body>  
 </html>  
-
