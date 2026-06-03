@@ -3,9 +3,12 @@ class Viewport {
         if (Viewport.instance) {  
             return Viewport.instance;  
         }  
-        this.a4Width = 210;  
-        this.a4Height = 297;  
+        this.worldWidth = 297;   // квадратное рабочее поле  
+        this.worldHeight = 297;  
         this.updateProjection();  
+        this.originalZoom = this.zoom;  
+        this.originalPanX = this.panX;  
+        this.originalPanY = this.panY;  
         Viewport.instance = this;  
     }  
 
@@ -20,11 +23,16 @@ class Viewport {
         const innerWidth = window.innerWidth;  
         const innerHeight = window.innerHeight;  
         const marginRatio = 0.9;  
-        const zoomX = (innerWidth * marginRatio) / this.a4Width;  
-        const zoomY = (innerHeight * marginRatio) / this.a4Height;  
+
+        const zoomX = (innerWidth * marginRatio) / this.worldWidth;  
+        const zoomY = (innerHeight * marginRatio) / this.worldHeight;  
         this.zoom = Math.min(zoomX, zoomY);  
-        this.panX = (innerWidth - this.a4Width * this.zoom) / 2;  
-        this.panY = (innerHeight - this.a4Height * this.zoom) / 2;  
+
+        this.minZoom = (innerHeight / 4) / this.worldHeight;  
+        this.maxZoom = innerWidth / 50;  
+
+        this.panX = (innerWidth - this.worldWidth * this.zoom) / 2;  
+        this.panY = (innerHeight - this.worldHeight * this.zoom) / 2;  
     }  
 
     toScreen(worldX, worldY) {  
@@ -48,10 +56,32 @@ class Viewport {
     getPan() {  
         return { panX: this.panX, panY: this.panY };  
     }  
+
+    zoomAt(factor, pivotX, pivotY) {  
+        const worldX = (pivotX - this.panX) / this.zoom;  
+        const worldY = (pivotY - this.panY) / this.zoom;  
+
+        let newZoom = this.zoom * factor;  
+        newZoom = Math.max(this.minZoom, Math.min(this.maxZoom, newZoom));  
+        if (newZoom === this.zoom) return;  
+
+        this.zoom = newZoom;  
+        this.panX = pivotX - worldX * this.zoom;  
+        this.panY = pivotY - worldY * this.zoom;  
+    }  
+
+    pan(dx, dy) {  
+        this.panX += dx;  
+        this.panY += dy;  
+    }  
+
+    reset() {  
+        this.zoom = this.originalZoom;  
+        this.panX = this.originalPanX;  
+        this.panY = this.originalPanY;  
+    }  
 }  
 
-// Делаем доступным глобально  
 window.Viewport = Viewport;  
-
 export { Viewport };  
 

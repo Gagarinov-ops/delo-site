@@ -62,7 +62,6 @@ document.querySelectorAll('.tool-btn:not(#elementsBtn)').forEach(btn => {
 
 // ---------- Логика Viewport и контейнера ----------  
 document.addEventListener('DOMContentLoaded', () => {  
-    // Используем getInstance, а не new  
     const viewport = Viewport.getInstance();  
     const container = document.getElementById('canvasContainer');  
     const mainCanvas = document.getElementById('mainCanvas');  
@@ -72,8 +71,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateContainer() {  
         const zoom = viewport.getZoom();  
         const { panX, panY } = viewport.getPan();  
-        const widthPx = viewport.a4Width * zoom;  
-        const heightPx = viewport.a4Height * zoom;  
+        const widthPx = viewport.worldWidth * zoom;  
+        const heightPx = viewport.worldHeight * zoom;  
 
         container.style.width = widthPx + 'px';  
         container.style.height = heightPx + 'px';  
@@ -92,15 +91,31 @@ document.addEventListener('DOMContentLoaded', () => {
         if (ctxOverlay) ctxOverlay.setTransform(dpr, 0, 0, dpr, 0, 0);  
     }  
 
-    updateContainer();  
+    // Инициализация InputHandler (импорт может быть уже вверху)  
+    import('./input/InputHandler.js').then(({ InputHandler }) => {  
+        new InputHandler(updateContainer);  
+    });  
+
+    // Кнопка сброса  
+    const resetBtn = document.getElementById('resetZoomButton');  
+    if (resetBtn) {  
+        resetBtn.addEventListener('click', () => {  
+            viewport.reset();  
+            updateContainer();  
+        });  
+    }  
 
     window.addEventListener('resize', () => {  
         viewport.updateProjection();  
+        viewport.originalZoom = viewport.zoom;  
+        viewport.originalPanX = viewport.panX;  
+        viewport.originalPanY = viewport.panY;  
         updateContainer();  
     });  
 
-    // Для отладки  
+    updateContainer();  
+
     window.viewport = viewport;  
-    console.log('Шаг 1: Viewport + контейнер загружены');  
-    console.log('zoom:', viewport.getZoom());  
+    console.log('Квадратное рабочее поле 297×297 мм готово');  
 });  
+
