@@ -67,7 +67,6 @@ body {
     transition: opacity 0.3s ease;  
 }  
 
-#gridLayerCoarse { z-index: 1; }  
 #gridLayerMedium { z-index: 2; }  
 #gridLayerFine { z-index: 3; }  
 
@@ -75,16 +74,16 @@ body {
     opacity: 1;  
     background-size: var(--step) var(--step);  
     background-image:  
-        repeating-linear-gradient(0deg, #FFD700 0px, #FFD700 0.5px, transparent 0.5px, transparent var(--step)),  
-        repeating-linear-gradient(90deg, #FFD700 0px, #FFD700 0.5px, transparent 0.5px, transparent var(--step));  
+        repeating-linear-gradient(0deg, #FFD700 0px, #FFD700 1px, transparent 1px, transparent var(--step)),  
+        repeating-linear-gradient(90deg, #FFD700 0px, #FFD700 1px, transparent 1px, transparent var(--step));  
 }  
 
 .grid-layer--transition {  
     opacity: 0.5;  
     background-size: var(--step) var(--step);  
     background-image:  
-        repeating-linear-gradient(0deg, #CCCCCC 0px, #CCCCCC 0.5px, transparent 0.5px, transparent var(--step)),  
-        repeating-linear-gradient(90deg, #CCCCCC 0px, #CCCCCC 0.5px, transparent 0.5px, transparent var(--step));  
+        repeating-linear-gradient(0deg, #CCCCCC 0px, #CCCCCC 1px, transparent 1px, transparent var(--step)),  
+        repeating-linear-gradient(90deg, #CCCCCC 0px, #CCCCCC 1px, transparent 1px, transparent var(--step));  
 }  
 
 /* === UI — Header === */  

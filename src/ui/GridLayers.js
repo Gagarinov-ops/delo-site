@@ -1,8 +1,7 @@
 export function setupGridLayers(dispatcher, viewport) {  
     const layers = {  
         fine: document.getElementById('gridLayerFine'),  
-        medium: document.getElementById('gridLayerMedium'),  
-        coarse: document.getElementById('gridLayerCoarse')  
+        medium: document.getElementById('gridLayerMedium')  
     };  
 
     function updateGrid(data) {  
@@ -35,12 +34,11 @@ export function setupGridLayers(dispatcher, viewport) {
             case 2: // начальный: жёлтая 5 мм  
                 if (layers.medium) layers.medium.classList.add('grid-layer--active');  
                 break;  
-            case 3: // переход: серая 5 мм + жёлтая 10 мм  
+            case 3: // переход: серая 5 мм  
                 if (layers.medium) layers.medium.classList.add('grid-layer--transition');  
-                if (layers.coarse) layers.coarse.classList.add('grid-layer--active');  
                 break;  
-            case 4: // максимальное отдаление: жёлтая 10 мм  
-                if (layers.coarse) layers.coarse.classList.add('grid-layer--active');  
+            case 4: // максимальное отдаление: тоже жёлтая 5 мм (нет слоя 10 мм)  
+                if (layers.medium) layers.medium.classList.add('grid-layer--active');  
                 break;  
             default: // fallback  
                 if (layers.medium) layers.medium.classList.add('grid-layer--active');  
@@ -48,5 +46,5 @@ export function setupGridLayers(dispatcher, viewport) {
     }  
 
     dispatcher.on('zoomChanged', updateGrid);  
+    updateGrid({ zoomLevel: viewport.currentZoomLevel });  
 }  
-
