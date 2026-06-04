@@ -1,4 +1,4 @@
-import { EventDispatcher } from './core/EventDispatcher.js';  
+import { EventDispatcher } from './core/events/EventDispatcher.js';  
 import { Viewport } from './viewport/Viewport.js';  
 import { InputHandler } from './input/InputHandler.js';  
 import { setupGridLayers } from './ui/GridLayers.js';  
@@ -7,6 +7,12 @@ import { setupZoomIndicator } from './ui/ZoomIndicator.js';
 import { setupMenu } from './ui/Menu.js';  
 import { setupResize } from './viewport/Resize.js';  
 import { setupDisplayDetector } from './viewport/DisplayDetector.js';  
+import Registry from './core/registry/Registry.js';  
+import GeometryValidator from './core/registry/GeometryValidator.js';  
+import Calculator from './core/registry/Calculator.js';  
+import GraphAnalyzer from './core/registry/GraphAnalyzer.js';  
+import CanvasData from './core/data/CanvasData.js';  
+import ActionLog from './core/events/ActionLog.js';  
 
 // ---------- Логика Viewport, контейнера и диспетчера ----------  
 document.addEventListener('DOMContentLoaded', () => {  
@@ -15,6 +21,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Передаём диспетчер во Viewport (и в Zoom)
     viewport.setDispatcher(dispatcher);
+
+    // Ядро
+    const registry = new Registry();
+    registry.validator = new GeometryValidator();
+    registry.calculator = new Calculator();
+    registry.analyzer = new GraphAnalyzer();
+
+    const actionLog = new ActionLog();
+    registry.actionLog = actionLog;
+
+    // При добавлении команды в ActionLog → Registry выполняет её
+    actionLog.addCommand = (function(originalAdd) {
+        return function(type, data, targetId) {
+            const entry = originalAdd.call(this, type, data, targetId);
+            registry.execute(entry);
+            dispatcher.emit('commandAdded', entry);
+            return entry;
+        };
+    })(actionLog.addCommand.bind(actionLog));
+
+    window.registry = registry;
+    window.CanvasData = CanvasData;
+    window.actionLog = actionLog;
 
     setupMenu();
 
