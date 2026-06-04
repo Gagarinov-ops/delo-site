@@ -11,8 +11,8 @@
         <div id="canvasBackground"></div>  
 
         <!-- Слои сетки -->  
-        <div id="gridLayerMedium" class="grid-layer grid-layer--active" data-step="5"></div>  
-        <div id="gridLayerFine" class="grid-layer" data-step="1"></div>  
+        <div id="gridLayerMedium" class="grid-layer grid-layer--active" data-step="5" data-zoom-min="1" data-zoom-max="4"></div>  
+        <div id="gridLayerFine" class="grid-layer" data-step="1" data-zoom-min="0" data-zoom-max="0"></div>  
 
         <canvas id="mainCanvas"></canvas>  
         <canvas id="overlayCanvas"></canvas>  
@@ -63,5 +63,4 @@
 
     <script src="src/main.js" type="module"></script>  
 </body>  
-</html>  
-
+</html>

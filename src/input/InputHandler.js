@@ -30,7 +30,7 @@ export class InputHandler {
         } else {  
             this.viewport.zoomOut();  
         }  
-        this.onUpdate('zoomChanged', { zoomLevel: this.viewport.currentZoomLevel });  
+        this.onUpdate('zoomChanged', { zoomLevel: this.viewport.getCurrentZoomLevel() });  
         this.onUpdate('panChanged', this.viewport.getPan());  
     }  
 
@@ -91,7 +91,7 @@ export class InputHandler {
                 }  
             }  
             if (this.pinchZoomed) {  
-                this.onUpdate('zoomChanged', { zoomLevel: this.viewport.currentZoomLevel });  
+                this.onUpdate('zoomChanged', { zoomLevel: this.viewport.getCurrentZoomLevel() });  
                 this.onUpdate('panChanged', this.viewport.getPan());  
             }  
         }  
@@ -102,5 +102,4 @@ export class InputHandler {
         this.pinchZoomed = false;  
         this.lastDist = 0;  
     }  
-}  
-
+}

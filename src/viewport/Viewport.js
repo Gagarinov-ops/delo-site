@@ -1,3 +1,5 @@
+import { Zoom } from './Zoom.js';
+
 class Viewport {  
     constructor() {  
         if (Viewport.instance) {  
@@ -5,12 +7,23 @@ class Viewport {
         }  
         this.worldWidth = 297;  
         this.worldHeight = 297;  
-        this.updateProjection();  
-        this.originalZoom = this.zoom;  
-        this.originalPanX = (window.innerWidth - this.worldWidth * this.zoom) / 2;  
-        this.originalPanY = (window.innerHeight - this.worldHeight * this.zoom) / 2;  
-        this.animating = false;  
-        this._pendingLevel = undefined;  
+
+        const innerWidth = window.innerWidth;
+        const innerHeight = window.innerHeight;
+        const marginRatio = 0.9;
+        const zoomX = (innerWidth * marginRatio) / this.worldWidth;
+        const zoomY = (innerHeight * marginRatio) / this.worldHeight;
+        const initialZoom = Math.min(zoomX, zoomY);
+        this.maxZoom = (innerWidth / 50) / 2;  // Уменьшаем вдвое
+
+        // dispatcher будет передан позже, пока создаём без него
+        this.dispatcher = null;
+        this.zoomManager = new Zoom(initialZoom, this.maxZoom, null);
+        this.originalPanX = (innerWidth - this.worldWidth * this.zoomManager.zoom) / 2;  
+        this.originalPanY = (innerHeight - this.worldHeight * this.zoomManager.zoom) / 2;  
+        this.panX = this.originalPanX;
+        this.panY = this.originalPanY;
+
         Viewport.instance = this;  
     }  
 
@@ -21,6 +34,15 @@ class Viewport {
         return Viewport.instance;  
     }  
 
+    setDispatcher(dispatcher) {
+        this.dispatcher = dispatcher;
+        // Пересоздаём zoomManager с диспетчером
+        const currentZoom = this.zoomManager.zoom;
+        this.zoomManager = new Zoom(currentZoom, this.maxZoom, dispatcher);
+    }
+
+    get zoom() { return this.zoomManager.zoom; }
+
     updateProjection() {  
         const innerWidth = window.innerWidth;  
         const innerHeight = window.innerHeight;  
@@ -28,23 +50,12 @@ class Viewport {
 
         const zoomX = (innerWidth * marginRatio) / this.worldWidth;  
         const zoomY = (innerHeight * marginRatio) / this.worldHeight;  
-        this.zoom = Math.min(zoomX, zoomY);  
+        const newZoom = Math.min(zoomX, zoomY);  
+        this.maxZoom = (innerWidth / 50) / 2;  // Уменьшаем вдвое при ресайзе тоже  
 
-        this.minZoom = (innerHeight / 4) / this.worldHeight;  
-        this.maxZoom = innerWidth / 50;  
-
-        this.panX = (innerWidth - this.worldWidth * this.zoom) / 2;  
-        this.panY = (innerHeight - this.worldHeight * this.zoom) / 2;  
-
-        // 5 уровней zoom  
-        this.zoomLevels = [  
-            this.maxZoom,  
-            Math.sqrt(this.maxZoom * this.zoom),  
-            this.zoom,  
-            Math.sqrt(this.zoom * this.minZoom),  
-            this.minZoom  
-        ];  
-        this.currentZoomLevel = 2;  
+        this.zoomManager = new Zoom(newZoom, this.maxZoom, this.dispatcher);
+        this.panX = (innerWidth - this.worldWidth * this.zoomManager.zoom) / 2;  
+        this.panY = (innerHeight - this.worldHeight * this.zoomManager.zoom) / 2;  
     }  
 
     toScreen(worldX, worldY) {  
@@ -61,88 +72,43 @@ class Viewport {
         };  
     }  
 
-    getZoom() {  
-        return this.zoom;  
-    }  
+    zoomIn() {
+        const target = this.zoomManager.currentZoomLevel - 1;
+        if (target < 0) return;
+
+        // Сохраняем мировую координату центра экрана
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const worldCX = (cx - this.panX) / this.zoom;
+        const worldCY = (cy - this.panY) / this.zoom;
+
+        this.zoomManager.zoomIn();
+
+        // Восстанавливаем центр
+        this.panX = cx - worldCX * this.zoom;
+        this.panY = cy - worldCY * this.zoom;
+    }
+
+    zoomOut() {
+        const target = this.zoomManager.currentZoomLevel + 1;
+        if (target >= this.zoomManager.zoomLevels.length) return;
+
+        const cx = window.innerWidth / 2;
+        const cy = window.innerHeight / 2;
+        const worldCX = (cx - this.panX) / this.zoom;
+        const worldCY = (cy - this.panY) / this.zoom;
+
+        this.zoomManager.zoomOut();
+
+        this.panX = cx - worldCX * this.zoom;
+        this.panY = cy - worldCY * this.zoom;
+    }
+
+    getZoom() { return this.zoomManager.zoom; }
+    getCurrentZoomLevel() { return this.zoomManager.getCurrentLevel(); }
 
     getPan() {  
         return { panX: this.panX, panY: this.panY };  
-    }  
-
-    _startAnimation(targetLevel) {  
-        if (targetLevel === this.currentZoomLevel) return;  
-
-        this.animating = true;  
-        const startZoom = this.zoom;  
-        const endZoom = this.zoomLevels[targetLevel];  
-        const startPanX = this.panX;  
-        const startPanY = this.panY;  
-        const duration = 200;  
-        const startTime = performance.now();  
-        const cx = window.innerWidth / 2;  
-        const cy = window.innerHeight / 2;  
-
-        const animate = (currentTime) => {  
-            const elapsed = currentTime - startTime;  
-            const progress = Math.min(elapsed / duration, 1.0);  
-
-            this.zoom = startZoom + (endZoom - startZoom) * progress;  
-
-            const worldCX = (cx - startPanX) / startZoom;  
-            const worldCY = (cy - startPanY) / startZoom;  
-            this.panX = cx - worldCX * this.zoom;  
-            this.panY = cy - worldCY * this.zoom;  
-
-            window.dispatchEvent(new CustomEvent('viewportChanged'));  
-
-            if (progress < 1.0) {  
-                requestAnimationFrame(animate);  
-            } else {  
-                // Финализация  
-                this.zoom = endZoom;  
-                const wCX = (cx - startPanX) / startZoom;  
-                const wCY = (cy - startPanY) / startZoom;  
-                this.panX = cx - wCX * this.zoom;  
-                this.panY = cy - wCY * this.zoom;  
-                this.currentZoomLevel = targetLevel;  
-                this.animating = false;  
-
-                // Оповещаем об изменении уровня зума  
-                window.dispatchEvent(new CustomEvent('zoomLevelChanged', { detail: { level: this.currentZoomLevel } }));  
-                window.dispatchEvent(new CustomEvent('viewportChanged'));  
-
-                // Если за время анимации накопился запрос — запустить следующий переход  
-                if (this._pendingLevel !== undefined) {  
-                    const pending = this._pendingLevel;  
-                    this._pendingLevel = undefined;  
-                    this._startAnimation(pending);  
-                }  
-            }  
-        };  
-
-        requestAnimationFrame(animate);  
-    }  
-
-    zoomIn() {  
-        const target = this.currentZoomLevel - 1;  
-        if (target < 0) return;  
-        if (this.animating) {  
-            // Сохраняем наименьший запрошенный уровень (приближение)  
-            this._pendingLevel = Math.min(this._pendingLevel !== undefined ? this._pendingLevel : target, target);  
-            return;  
-        }  
-        this._startAnimation(target);  
-    }  
-
-    zoomOut() {  
-        const target = this.currentZoomLevel + 1;  
-        if (target >= this.zoomLevels.length) return;  
-        if (this.animating) {  
-            // Сохраняем наибольший запрошенный уровень (отдаление)  
-            this._pendingLevel = Math.max(this._pendingLevel !== undefined ? this._pendingLevel : target, target);  
-            return;  
-        }  
-        this._startAnimation(target);  
     }  
 
     pan(dx, dy) {  
@@ -152,17 +118,13 @@ class Viewport {
     }  
 
     reset() {  
-        // Синхронный сброс без анимации  
-        this.zoom = this.originalZoom;  
+        this.zoomManager.reset();
         this.panX = this.originalPanX;  
         this.panY = this.originalPanY;  
-        this.currentZoomLevel = 2;  
-        this.animating = false;  
-        this._pendingLevel = undefined;  
         window.dispatchEvent(new CustomEvent('viewportChanged'));  
-        window.dispatchEvent(new CustomEvent('zoomLevelChanged', { detail: { level: this.currentZoomLevel } }));  
+        window.dispatchEvent(new CustomEvent('zoomLevelChanged', { detail: { level: this.zoomManager.getCurrentLevel() } }));  
     }  
 }  
 
 window.Viewport = Viewport;  
-export { Viewport };  
+export { Viewport };
