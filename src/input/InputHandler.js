@@ -22,7 +22,12 @@ export class InputHandler {
         document.addEventListener('touchstart', this.onTouchStart.bind(this), { passive: false });  
         document.addEventListener('touchmove', this.onTouchMove.bind(this), { passive: false });  
         document.addEventListener('touchend', this.onTouchEnd.bind(this));  
-    }  
+    }
+
+    _isCanvasTarget(target) {
+        const container = document.getElementById('canvasContainer');
+        return container && container.contains(target);
+    }
 
     onWheel(e) {  
         e.preventDefault();  
@@ -37,10 +42,14 @@ export class InputHandler {
 
     onPointerDown(e) {  
         if (e.isPrimary) {  
-            if (window.toolManager && window.toolManager.getActiveName() !== 'cursor') {  
-                window.toolManager.handleGesture('pointerdown', { x: e.clientX, y: e.clientY });  
-                this._toolActive = true;  
-                return;  
+            if (window.toolManager && window.toolManager.getActiveName() !== 'cursor') {
+                if (this._isCanvasTarget(e.target)) {
+                    window.toolManager.handleGesture('pointerdown', { x: e.clientX, y: e.clientY });  
+                    this._toolActive = true;
+                } else {
+                    this._toolActive = false;
+                }
+                return;
             }  
 
             this._toolActive = false;  
@@ -121,4 +130,4 @@ export class InputHandler {
         this.pinchZoomed = false;  
         this.lastDist = 0;  
     }  
-}  
+}

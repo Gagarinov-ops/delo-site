@@ -1,8 +1,9 @@
 import Overlay from './Overlay.js';
+import MainCanvas from './MainCanvas.js';
 
 export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
     const container = document.getElementById('canvasContainer');
-    const mainCanvas = document.getElementById('mainCanvas');
+    const mainCanvas = new MainCanvas('mainCanvas');
     const overlayCanvas = document.getElementById('overlayCanvas');
     const dpr = window.devicePixelRatio || 1;
 
@@ -19,6 +20,26 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
         }
     }
 
+    function redrawMainCanvas() {
+        const w = mainCanvas.canvas.width / dpr;
+        const h = mainCanvas.canvas.height / dpr;
+        mainCanvas.ctx.clearRect(0, 0, w, h);
+
+        // Рисуем все стены
+        Object.values(canvasDataCopy.walls).forEach(wall => {
+            const p1 = canvasDataCopy.getPoint(wall.pointStartId);
+            const p2 = canvasDataCopy.getPoint(wall.pointEndId);
+            if (p1 && p2) {
+                mainCanvas.drawLine(p1.x, p1.y, p2.x, p2.y);
+            }
+        });
+
+        // Рисуем все точки
+        Object.values(canvasDataCopy.points).forEach(point => {
+            mainCanvas.drawPoint(point.x, point.y);
+        });
+    }
+
     function updateSize() {
         const zoom = viewport.getZoom();
         const widthPx = viewport.worldWidth * zoom;
@@ -29,18 +50,19 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
 
         const canvasWidthPhys = widthPx * dpr;
         const canvasHeightPhys = heightPx * dpr;
-        mainCanvas.width = canvasWidthPhys;
-        mainCanvas.height = canvasHeightPhys;
+        mainCanvas.canvas.width = canvasWidthPhys;
+        mainCanvas.canvas.height = canvasHeightPhys;
         overlayCanvas.width = canvasWidthPhys;
         overlayCanvas.height = canvasHeightPhys;
 
-        const ctxMain = mainCanvas.getContext('2d');
+        mainCanvas.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         const ctxOverlay = overlayCanvas.getContext('2d');
-        if (ctxMain) ctxMain.setTransform(dpr, 0, 0, dpr, 0, 0);
         if (ctxOverlay) {
             ctxOverlay.setTransform(dpr, 0, 0, dpr, 0, 0);
-            overlay.clear(); // очищаем Overlay при изменении размера
+            overlay.clear();
         }
+
+        redrawMainCanvas();
     }
 
     // Подписка на toolResult от ToolManager (пиксели)
@@ -50,7 +72,6 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
         overlay.clear();
 
         if (data.gesture === 'pointerup') {
-            // Пока ничего — фиксация на MainCanvas будет позже
             return;
         }
 
@@ -61,6 +82,23 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
             data.toolResult.currentX,
             data.toolResult.currentY
         );
+    });
+
+    // Подписка на commandApproved — рисуем подтверждённую стену на MainCanvas
+    dispatcher.on('commandApproved', (entry) => {
+        if (entry.type !== 'wallCreated') return;
+
+        const wall = canvasDataCopy.getWall(canvasDataCopy._lastAdded.wallId);
+        if (!wall) return;
+
+        const p1 = canvasDataCopy.getPoint(wall.pointStartId);
+        const p2 = canvasDataCopy.getPoint(wall.pointEndId);
+        if (!p1 || !p2) return;
+
+        mainCanvas.drawLine(p1.x, p1.y, p2.x, p2.y);
+        // Точки на концах стены
+        mainCanvas.drawPoint(p1.x, p1.y);
+        mainCanvas.drawPoint(p2.x, p2.y);
     });
 
     return { updatePosition, updateSize };

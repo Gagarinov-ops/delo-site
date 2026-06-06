@@ -60,11 +60,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (idx !== -1) {
                     this.entries.splice(idx, 1);
                 }
+                dispatcher.emit('commandRejected', { entry, error: result.error });
                 dispatcher.emit('showToast', { message: result.error });
                 return result;
             }
             
-            // Больше не отправляем commandAdded — оно никем не слушается и удалено из CanvasContainer
+            dispatcher.emit('commandApproved', entry);
             return entry;
         };
     })(actionLog.addCommand.bind(actionLog));
@@ -74,6 +75,17 @@ document.addEventListener('DOMContentLoaded', () => {
     window.actionLog = actionLog;
     window.CanvasDataCopy = CanvasDataCopy;
     window.dispatcher = dispatcher;
+
+    // Подписки для CanvasDataCopy
+    dispatcher.on('toolResult', (data) => {
+        if (data.gesture === 'pointerup' && data.toolResult) {
+            CanvasDataCopy.saveFromToolResult(data.toolResult);
+        }
+    });
+
+    dispatcher.on('commandRejected', () => {
+        CanvasDataCopy.removeLast();
+    });
 
     setupMenu();
     setupToast(dispatcher);
@@ -121,6 +133,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const toolManager = new ToolManager();
     toolManager.setDispatcher(dispatcher);  // передаём диспетчер
     toolManager.setCoordinateMapper(coordinateMapper);  // передаём CoordinateMapper
+    toolManager.setActionLog(actionLog);  // передаём ActionLog
     toolManager.register('cursor', new CursorTool());
     toolManager.register('pencil', new PencilTool());
 

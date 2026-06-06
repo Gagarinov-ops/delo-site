@@ -93,6 +93,26 @@ class CoordinateMapper {
 
         return translated;
     }
+
+    translateToolResultToWorld(toolResult) {
+        if (!toolResult) return null;
+
+        const translated = {};
+
+        if (toolResult.startX !== undefined && toolResult.startY !== undefined) {
+            const world = this.screenToWorld(toolResult.startX, toolResult.startY);
+            translated.startX = world.x;
+            translated.startY = world.y;
+        }
+
+        if (toolResult.endX !== undefined && toolResult.endY !== undefined) {
+            const world = this.screenToWorld(toolResult.endX, toolResult.endY);
+            translated.endX = world.x;
+            translated.endY = world.y;
+        }
+
+        return translated;
+    }
 }
 
 export default CoordinateMapper;

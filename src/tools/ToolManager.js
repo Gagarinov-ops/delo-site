@@ -4,6 +4,7 @@ class ToolManager {
         this.activeTool = null;
         this.dispatcher = null;
         this.coordinateMapper = null;
+        this.actionLog = null;
     }
 
     setDispatcher(dispatcher) {
@@ -12,6 +13,10 @@ class ToolManager {
 
     setCoordinateMapper(mapper) {
         this.coordinateMapper = mapper;
+    }
+
+    setActionLog(actionLog) {
+        this.actionLog = actionLog;
     }
 
     register(name, tool) {
@@ -49,18 +54,27 @@ class ToolManager {
 
         if (!toolResult) return null;
 
-        // 2. Переводим координаты через CoordinateMapper
+        // 2. Переводим координаты через CoordinateMapper (для Overlay — пиксели)
         let translatedResult = toolResult;
         if (this.coordinateMapper) {
             this.coordinateMapper.remember(data.x, data.y);
             translatedResult = this.coordinateMapper.translateToolResult(toolResult);
         }
 
-        // 3. Отправляем переведённые координаты в диспетчер
+        // 3. Отправляем переведённые координаты в диспетчер (пиксели для Overlay)
         if (this.dispatcher) {
             this.dispatcher.emit('toolResult', {
                 gesture: gesture,
                 toolResult: translatedResult
+            });
+        }
+
+        // 4. При pointerup — отправляем в ActionLog (миллиметры)
+        if (gesture === 'pointerup' && this.actionLog && this.coordinateMapper) {
+            const worldResult = this.coordinateMapper.translateToolResultToWorld(toolResult);
+            this.actionLog.addCommand('wallCreated', {
+                pointStart: { x: worldResult.startX, y: worldResult.startY },
+                pointEnd: { x: worldResult.endX, y: worldResult.endY }
             });
         }
 
