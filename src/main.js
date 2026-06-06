@@ -20,26 +20,21 @@ import CursorTool from './tools/CursorTool.js';
 import PencilTool from './tools/PencilTool.js';  
 import CoordinateMapper from './viewport/CoordinateMapper.js';  
 
-// ---------- Логика Viewport, контейнера и диспетчера ----------  
 document.addEventListener('DOMContentLoaded', () => {  
     const dispatcher = new EventDispatcher();  
     const viewport = Viewport.getInstance();  
 
-    // Передаём диспетчер во Viewport (и в Zoom)
     viewport.setDispatcher(dispatcher);
 
-    // CoordinateMapper — центр координат, подписывается на cameraChanged и toolGesture
     const coordinateMapper = new CoordinateMapper(dispatcher);
     window.coordinateMapper = coordinateMapper;
 
-    // Отправляем начальные параметры камеры
     dispatcher.emit('cameraChanged', {
         zoom: viewport.getZoom(),
         panX: viewport.getPan().panX,
         panY: viewport.getPan().panY
     });
 
-    // Ядро
     const registry = new Registry();
     registry.validator = new GeometryValidator();
     registry.calculator = new Calculator();
@@ -48,14 +43,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const actionLog = new ActionLog();
     registry.actionLog = actionLog;
 
-    // При добавлении команды в ActionLog → Registry выполняет её
     actionLog.addCommand = (function(originalAdd) {
         return function(type, data, targetId) {
             const entry = originalAdd.call(this, type, data, targetId);
             const result = registry.execute(entry);
             
             if (result && !result.success) {
-                // Удаляем невалидную запись из журнала
                 const idx = this.entries.indexOf(entry);
                 if (idx !== -1) {
                     this.entries.splice(idx, 1);
@@ -76,7 +69,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.CanvasDataCopy = CanvasDataCopy;
     window.dispatcher = dispatcher;
 
-    // Подписки для CanvasDataCopy
     dispatcher.on('toolResult', (data) => {
         if (data.gesture === 'pointerup' && data.toolResult) {
             CanvasDataCopy.saveFromToolResult(data.toolResult);
@@ -94,46 +86,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const { updatePosition, updateSize } = canvasContainer;
     window._canvasContainer = canvasContainer;
 
-    // InputHandler теперь вызывает колбэк с событиями  
     const inputHandler = new InputHandler((type, data) => {  
-        if (type === 'panChanged') {
-            updatePosition();
-        } else if (type === 'zoomChanged') {
-            updateSize();
-            updatePosition();
-        }
         dispatcher.emit(type, data);  
     });  
 
-    // Инициализация индикатора зума  
     setupZoomIndicator(dispatcher, viewport);  
-
-    // Инициализация сетки (отправит gridConfig, который Zoom уже ждёт)
     setupGridLayers(dispatcher, viewport);  
-
-    // Инициализация адаптации под DPR
     setupDisplayDetector(dispatcher);
 
-    // Кнопка сброса  
     const resetBtn = document.getElementById('resetZoomButton');  
     if (resetBtn) {  
         resetBtn.addEventListener('click', () => {  
             viewport.reset();  
-            updateSize();
-            updatePosition();
-            dispatcher.emit('zoomChanged', { zoomLevel: viewport.getCurrentZoomLevel() });  
-            dispatcher.emit('panChanged', viewport.getPan());  
         });  
     }  
 
-    // Ресайз окна
-    setupResize(viewport, dispatcher, updateSize, updatePosition);
+    setupResize(viewport, dispatcher);
 
-    // Инструменты
     const toolManager = new ToolManager();
-    toolManager.setDispatcher(dispatcher);  // передаём диспетчер
-    toolManager.setCoordinateMapper(coordinateMapper);  // передаём CoordinateMapper
-    toolManager.setActionLog(actionLog);  // передаём ActionLog
+    toolManager.setDispatcher(dispatcher);
+    toolManager.setCoordinateMapper(coordinateMapper);
+    toolManager.setActionLog(actionLog);
     toolManager.register('cursor', new CursorTool());
     toolManager.register('pencil', new PencilTool());
 
@@ -157,8 +130,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     updateSize();
     updatePosition();
-    // Начальное событие зума для индикатора и сетки  
-    dispatcher.emit('zoomChanged', { zoomLevel: viewport.getCurrentZoomLevel() });  
 
     window.viewport = viewport;  
     console.log('EventDispatcher, слои сетки и индикатор готовы');  

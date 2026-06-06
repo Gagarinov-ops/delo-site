@@ -12,12 +12,24 @@ class Overlay {
     }
 
     drawLine(x1, y1, x2, y2, color = '#1E90FF', lineWidth = 3) {
+        this.ctx.setLineDash([]); // сплошная линия
         this.ctx.strokeStyle = color;
         this.ctx.lineWidth = lineWidth;
         this.ctx.beginPath();
         this.ctx.moveTo(x1, y1);
         this.ctx.lineTo(x2, y2);
         this.ctx.stroke();
+    }
+
+    drawDashedLine(x1, y1, x2, y2, color = '#1E90FF', lineWidth = 3) {
+        this.ctx.setLineDash([8, 6]); // пунктир
+        this.ctx.strokeStyle = color;
+        this.ctx.lineWidth = lineWidth;
+        this.ctx.beginPath();
+        this.ctx.moveTo(x1, y1);
+        this.ctx.lineTo(x2, y2);
+        this.ctx.stroke();
+        this.ctx.setLineDash([]); // сброс
     }
 }
 

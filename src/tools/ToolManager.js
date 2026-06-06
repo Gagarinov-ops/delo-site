@@ -46,7 +46,6 @@ class ToolManager {
     }
 
     handleGesture(gesture, data) {
-        // 1. Получаем результат от инструмента (пиксели)
         let toolResult = null;
         if (this.activeTool && this.activeTool.handleGesture) {
             toolResult = this.activeTool.handleGesture(gesture, data);
@@ -54,24 +53,23 @@ class ToolManager {
 
         if (!toolResult) return null;
 
-        // 2. Переводим координаты через CoordinateMapper (для Overlay — пиксели)
-        let translatedResult = toolResult;
+        // Переводим координаты в миллиметры через CoordinateMapper
+        let worldResult = toolResult;
         if (this.coordinateMapper) {
             this.coordinateMapper.remember(data.x, data.y);
-            translatedResult = this.coordinateMapper.translateToolResult(toolResult);
+            worldResult = this.coordinateMapper.translateToolResultToWorld(toolResult);
         }
 
-        // 3. Отправляем переведённые координаты в диспетчер (пиксели для Overlay)
+        // Отправляем миллиметры в диспетчер
         if (this.dispatcher) {
             this.dispatcher.emit('toolResult', {
                 gesture: gesture,
-                toolResult: translatedResult
+                toolResult: worldResult
             });
         }
 
-        // 4. При pointerup — отправляем в ActionLog (миллиметры)
+        // При pointerup — отправляем в ActionLog (миллиметры)
         if (gesture === 'pointerup' && this.actionLog && this.coordinateMapper) {
-            const worldResult = this.coordinateMapper.translateToolResultToWorld(toolResult);
             this.actionLog.addCommand('wallCreated', {
                 pointStart: { x: worldResult.startX, y: worldResult.startY },
                 pointEnd: { x: worldResult.endX, y: worldResult.endY }
@@ -82,4 +80,4 @@ class ToolManager {
     }
 }
 
-export default ToolManager;
+export default ToolManager;
