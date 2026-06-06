@@ -56,6 +56,7 @@ class Viewport {
         this.zoomManager = new Zoom(newZoom, this.maxZoom, this.dispatcher);
         this.panX = (innerWidth - this.worldWidth * this.zoomManager.zoom) / 2;  
         this.panY = (innerHeight - this.worldHeight * this.zoomManager.zoom) / 2;  
+        this._notifyCameraChanged();
     }  
 
     toScreen(worldX, worldY) {  
@@ -87,6 +88,7 @@ class Viewport {
         // Восстанавливаем центр
         this.panX = cx - worldCX * this.zoom;
         this.panY = cy - worldCY * this.zoom;
+        this._notifyCameraChanged();
     }
 
     zoomOut() {
@@ -102,6 +104,7 @@ class Viewport {
 
         this.panX = cx - worldCX * this.zoom;
         this.panY = cy - worldCY * this.zoom;
+        this._notifyCameraChanged();
     }
 
     getZoom() { return this.zoomManager.zoom; }
@@ -115,6 +118,7 @@ class Viewport {
         this.panX += dx;  
         this.panY += dy;  
         window.dispatchEvent(new CustomEvent('viewportChanged'));  
+        this._notifyCameraChanged();
     }  
 
     reset() {  
@@ -123,7 +127,18 @@ class Viewport {
         this.panY = this.originalPanY;  
         window.dispatchEvent(new CustomEvent('viewportChanged'));  
         window.dispatchEvent(new CustomEvent('zoomLevelChanged', { detail: { level: this.zoomManager.getCurrentLevel() } }));  
-    }  
+        this._notifyCameraChanged();
+    }
+
+    _notifyCameraChanged() {
+        if (this.dispatcher) {
+            this.dispatcher.emit('cameraChanged', {
+                zoom: this.getZoom(),
+                panX: this.getPan().panX,
+                panY: this.getPan().panY
+            });
+        }
+    }
 }  
 
 window.Viewport = Viewport;  

@@ -10,6 +10,7 @@ export class InputHandler {
         this.pinchActive = false;  
         this.lastDist = 0;  
         this.pinchZoomed = false;  
+        this._toolActive = false;  
         this.initEvents();  
     }  
 
@@ -36,6 +37,13 @@ export class InputHandler {
 
     onPointerDown(e) {  
         if (e.isPrimary) {  
+            if (window.toolManager && window.toolManager.getActiveName() !== 'cursor') {  
+                window.toolManager.handleGesture('pointerdown', { x: e.clientX, y: e.clientY });  
+                this._toolActive = true;  
+                return;  
+            }  
+
+            this._toolActive = false;  
             this.dragging = true;  
             this.lastX = e.clientX;  
             this.lastY = e.clientY;  
@@ -44,6 +52,11 @@ export class InputHandler {
     }  
 
     onPointerMove(e) {  
+        if (this._toolActive && window.toolManager) {  
+            window.toolManager.handleGesture('pointermove', { x: e.clientX, y: e.clientY });  
+            return;  
+        }  
+
         if (this.dragging && !this.pinchActive) {  
             const dx = e.clientX - this.lastX;  
             const dy = e.clientY - this.lastY;  
@@ -57,6 +70,12 @@ export class InputHandler {
     }  
 
     onPointerUp(e) {  
+        if (this._toolActive && window.toolManager) {  
+            window.toolManager.handleGesture('pointerup', { x: e.clientX, y: e.clientY });  
+            this._toolActive = false;  
+            return;  
+        }  
+
         if (e.isPrimary) {  
             this.dragging = false;  
         }  
@@ -102,4 +121,4 @@ export class InputHandler {
         this.pinchZoomed = false;  
         this.lastDist = 0;  
     }  
-}
+}  

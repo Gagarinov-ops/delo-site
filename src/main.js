@@ -7,12 +7,18 @@ import { setupZoomIndicator } from './ui/ZoomIndicator.js';
 import { setupMenu } from './ui/Menu.js';  
 import { setupResize } from './viewport/Resize.js';  
 import { setupDisplayDetector } from './viewport/DisplayDetector.js';  
+import { setupToast } from './ui/Toast.js';  
 import Registry from './core/registry/Registry.js';  
 import GeometryValidator from './core/registry/GeometryValidator.js';  
 import Calculator from './core/registry/Calculator.js';  
 import GraphAnalyzer from './core/registry/GraphAnalyzer.js';  
 import CanvasData from './core/data/CanvasData.js';  
 import ActionLog from './core/events/ActionLog.js';  
+import CanvasDataCopy from './core/data/CanvasDataCopy.js';  
+import ToolManager from './tools/ToolManager.js';  
+import CursorTool from './tools/CursorTool.js';  
+import PencilTool from './tools/PencilTool.js';  
+import CoordinateMapper from './viewport/CoordinateMapper.js';  
 
 // ---------- Логика Viewport, контейнера и диспетчера ----------  
 document.addEventListener('DOMContentLoaded', () => {  
@@ -21,6 +27,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Передаём диспетчер во Viewport (и в Zoom)
     viewport.setDispatcher(dispatcher);
+
+    // CoordinateMapper — центр координат, подписывается на cameraChanged и toolGesture
+    const coordinateMapper = new CoordinateMapper(dispatcher);
+    window.coordinateMapper = coordinateMapper;
+
+    // Отправляем начальные параметры камеры
+    dispatcher.emit('cameraChanged', {
+        zoom: viewport.getZoom(),
+        panX: viewport.getPan().panX,
+        panY: viewport.getPan().panY
+    });
 
     // Ядро
     const registry = new Registry();
@@ -35,8 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
     actionLog.addCommand = (function(originalAdd) {
         return function(type, data, targetId) {
             const entry = originalAdd.call(this, type, data, targetId);
-            registry.execute(entry);
-            dispatcher.emit('commandAdded', entry);
+            const result = registry.execute(entry);
+            
+            if (result && !result.success) {
+                // Удаляем невалидную запись из журнала
+                const idx = this.entries.indexOf(entry);
+                if (idx !== -1) {
+                    this.entries.splice(idx, 1);
+                }
+                dispatcher.emit('showToast', { message: result.error });
+                return result;
+            }
+            
+            // Больше не отправляем commandAdded — оно никем не слушается и удалено из CanvasContainer
             return entry;
         };
     })(actionLog.addCommand.bind(actionLog));
@@ -44,10 +72,15 @@ document.addEventListener('DOMContentLoaded', () => {
     window.registry = registry;
     window.CanvasData = CanvasData;
     window.actionLog = actionLog;
+    window.CanvasDataCopy = CanvasDataCopy;
+    window.dispatcher = dispatcher;
 
     setupMenu();
+    setupToast(dispatcher);
 
-    const { updatePosition, updateSize } = setupCanvasContainer(viewport);  
+    const canvasContainer = setupCanvasContainer(viewport, dispatcher, CanvasDataCopy);
+    const { updatePosition, updateSize } = canvasContainer;
+    window._canvasContainer = canvasContainer;
 
     // InputHandler теперь вызывает колбэк с событиями  
     const inputHandler = new InputHandler((type, data) => {  
@@ -83,6 +116,31 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Ресайз окна
     setupResize(viewport, dispatcher, updateSize, updatePosition);
+
+    // Инструменты
+    const toolManager = new ToolManager();
+    toolManager.setDispatcher(dispatcher);  // передаём диспетчер
+    toolManager.setCoordinateMapper(coordinateMapper);  // передаём CoordinateMapper
+    toolManager.register('cursor', new CursorTool());
+    toolManager.register('pencil', new PencilTool());
+
+    function activateTool(toolName) {
+        toolManager.activate(toolName);
+        
+        document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        const activeBtn = document.querySelector(`.tool-btn[data-tool="${toolName}"]`);
+        if (activeBtn) {
+            activeBtn.classList.add('active');
+        }
+    }
+
+    document.querySelector('[data-tool="cursor"]')?.addEventListener('click', () => activateTool('cursor'));
+    document.querySelector('[data-tool="pencil"]')?.addEventListener('click', () => activateTool('pencil'));
+
+    activateTool('cursor');
+    window.toolManager = toolManager;
 
     updateSize();
     updatePosition();
