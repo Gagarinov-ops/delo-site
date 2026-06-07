@@ -1,3 +1,5 @@
+import { isValidWorldPoint } from './PanLimits.js';
+
 class CoordinateMapper {
     constructor(dispatcher) {
         this.dispatcher = dispatcher;
@@ -28,17 +30,24 @@ class CoordinateMapper {
         const worldX = (screenX - this.panX) / this.zoom;
         const worldY = (screenY - this.panY) / this.zoom;
 
-        this.dispatcher.emit('worldCoords', {
-            gesture: gesture,
-            worldX: worldX,
-            worldY: worldY
-        });
+        if (this.isValidWorldPoint(worldX, worldY)) {
+            this.dispatcher.emit('worldCoords', {
+                gesture: gesture,
+                worldX: worldX,
+                worldY: worldY
+            });
 
-        this.dispatcher.emit('screenCoords', {
-            gesture: gesture,
-            screenX: screenX,
-            screenY: screenY
-        });
+            this.dispatcher.emit('screenCoords', {
+                gesture: gesture,
+                screenX: screenX,
+                screenY: screenY
+            });
+        }
+    }
+
+    // Публичный метод для проверки валидности мировых координат
+    isValidWorldPoint(x, y) {
+        return isValidWorldPoint(x, y);
     }
 
     screenToWorld(screenX, screenY) {
@@ -57,6 +66,7 @@ class CoordinateMapper {
 
     translateToolResult(toolResult) {
         if (!toolResult) return null;
+
         const translated = {};
 
         if (toolResult.startX !== undefined && toolResult.startY !== undefined) {
@@ -80,17 +90,13 @@ class CoordinateMapper {
 
     translateToolResultToWorld(toolResult) {
         if (!toolResult) return null;
+
         const translated = {};
 
         if (toolResult.startX !== undefined && toolResult.startY !== undefined) {
             const world = this.screenToWorld(toolResult.startX, toolResult.startY);
             translated.startX = world.x;
             translated.startY = world.y;
-        }
-        if (toolResult.currentX !== undefined && toolResult.currentY !== undefined) {
-            const world = this.screenToWorld(toolResult.currentX, toolResult.currentY);
-            translated.currentX = world.x;
-            translated.currentY = world.y;
         }
         if (toolResult.endX !== undefined && toolResult.endY !== undefined) {
             const world = this.screenToWorld(toolResult.endX, toolResult.endY);

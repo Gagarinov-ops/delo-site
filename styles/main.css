@@ -24,19 +24,11 @@ body {
     left: 0;  
     transform-origin: 0 0;  
     z-index: 0;  
-}  
-
-#canvasBackground {  
-    position: absolute;  
-    top: 0;  
-    left: 0;  
-    width: 100%;  
-    height: 100%;  
     background: #FFFFFF;  
-    z-index: 0;  
 }  
 
 /* === Холсты === */  
+#gridCanvas,
 #mainCanvas,  
 #overlayCanvas {  
     position: absolute;  
@@ -48,43 +40,16 @@ body {
     background: transparent;  
 }  
 
+#gridCanvas {  
+    z-index: 1;  
+}  
+
 #mainCanvas {  
     z-index: 4;  
 }  
 
 #overlayCanvas {  
     z-index: 5;  
-}  
-
-/* === Слои сетки === */  
-.grid-layer {  
-    position: absolute;  
-    top: 0;  
-    left: 0;  
-    width: 100%;  
-    height: 100%;  
-    pointer-events: none;  
-    opacity: 0;  
-    transition: opacity 0.3s ease;  
-}  
-
-#gridLayerMedium { z-index: 2; }  
-#gridLayerFine { z-index: 3; }  
-
-.grid-layer--active {  
-    opacity: 1;  
-    background-size: var(--step) var(--step);  
-    background-image:  
-        repeating-linear-gradient(0deg, #FFD700 0px, #FFD700 1px, transparent 1px, transparent var(--step)),  
-        repeating-linear-gradient(90deg, #FFD700 0px, #FFD700 1px, transparent 1px, transparent var(--step));  
-}  
-
-.grid-layer--transition {  
-    opacity: 0.5;  
-    background-size: var(--step) var(--step);  
-    background-image:  
-        repeating-linear-gradient(0deg, #CCCCCC 0px, #CCCCCC 1px, transparent 1px, transparent var(--step)),  
-        repeating-linear-gradient(90deg, #CCCCCC 0px, #CCCCCC 1px, transparent 1px, transparent var(--step));  
 }  
 
 /* === UI — Header === */  

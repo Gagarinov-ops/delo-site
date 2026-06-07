@@ -1,13 +1,13 @@
 import { EventDispatcher } from './core/events/EventDispatcher.js';  
 import { Viewport } from './viewport/Viewport.js';  
 import { InputHandler } from './input/InputHandler.js';  
-import { setupGridLayers } from './ui/GridLayers.js';  
 import { setupCanvasContainer } from './ui/CanvasContainer.js';  
 import { setupZoomIndicator } from './ui/ZoomIndicator.js';  
 import { setupMenu } from './ui/Menu.js';  
 import { setupResize } from './viewport/Resize.js';  
 import { setupDisplayDetector } from './viewport/DisplayDetector.js';  
 import { setupToast } from './ui/Toast.js';  
+import GridCanvas from './ui/GridCanvas.js';  
 import Registry from './core/registry/Registry.js';  
 import GeometryValidator from './core/registry/GeometryValidator.js';  
 import Calculator from './core/registry/Calculator.js';  
@@ -28,12 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const coordinateMapper = new CoordinateMapper(dispatcher);
     window.coordinateMapper = coordinateMapper;
-
-    dispatcher.emit('cameraChanged', {
-        zoom: viewport.getZoom(),
-        panX: viewport.getPan().panX,
-        panY: viewport.getPan().panY
-    });
 
     const registry = new Registry();
     registry.validator = new GeometryValidator();
@@ -69,9 +63,23 @@ document.addEventListener('DOMContentLoaded', () => {
     window.CanvasDataCopy = CanvasDataCopy;
     window.dispatcher = dispatcher;
 
+    const canvasContainer = setupCanvasContainer(viewport, dispatcher, CanvasDataCopy);
+    const { updatePosition, updateSize, hitTest } = canvasContainer;
+    window._canvasContainer = canvasContainer;
+    window._hitTest = hitTest;
+
     dispatcher.on('toolResult', (data) => {
         if (data.gesture === 'pointerup' && data.toolResult) {
-            CanvasDataCopy.saveFromToolResult(data.toolResult);
+            const snappedStart = hitTest.snap(data.toolResult.startX, data.toolResult.startY);
+            const snappedEnd = hitTest.snap(data.toolResult.endX, data.toolResult.endY);
+            const snappedResult = {
+                ...data.toolResult,
+                startX: snappedStart.x,
+                startY: snappedStart.y,
+                endX: snappedEnd.x,
+                endY: snappedEnd.y
+            };
+            CanvasDataCopy.saveFromToolResult(snappedResult);
         }
     });
 
@@ -82,16 +90,21 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMenu();
     setupToast(dispatcher);
 
-    const canvasContainer = setupCanvasContainer(viewport, dispatcher, CanvasDataCopy);
-    const { updatePosition, updateSize } = canvasContainer;
-    window._canvasContainer = canvasContainer;
+    const gridCanvas = new GridCanvas(dispatcher);
+    window._gridCanvas = gridCanvas;
+
+    dispatcher.emit('cameraChanged', {
+        zoom: viewport.getZoom(),
+        panX: viewport.getPan().panX,
+        panY: viewport.getPan().panY
+    });
+    dispatcher.emit('zoomChanged', { zoomLevel: viewport.getCurrentZoomLevel() });
 
     const inputHandler = new InputHandler((type, data) => {  
         dispatcher.emit(type, data);  
     });  
 
-    setupZoomIndicator(dispatcher, viewport);  
-    setupGridLayers(dispatcher, viewport);  
+    setupZoomIndicator(dispatcher);  
     setupDisplayDetector(dispatcher);
 
     const resetBtn = document.getElementById('resetZoomButton');  
@@ -105,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const toolManager = new ToolManager();
     toolManager.setDispatcher(dispatcher);
-    toolManager.setCoordinateMapper(coordinateMapper);
+    toolManager.setCoordinateMapper(coordinateMapper); // возвращаем
     toolManager.setActionLog(actionLog);
     toolManager.register('cursor', new CursorTool());
     toolManager.register('pencil', new PencilTool());

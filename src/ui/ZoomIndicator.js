@@ -1,15 +1,13 @@
-export function setupZoomIndicator(dispatcher, viewport) {
+export function setupZoomIndicator(dispatcher) {
     const indicator = document.getElementById('zoomIndicator');
     if (!indicator) return;
 
-    let currentGridStep = '5 мм';  // значение по умолчанию
+    let currentGridStep = '5 мм';
 
-    // Подписка на изменение активной сетки
-    dispatcher.on('activeGridChanged', (data) => {
+    dispatcher.on('gridChanged', (data) => {
         currentGridStep = data.step;
     });
 
-    // Подписка на изменение zoom
     dispatcher.on('zoomChanged', (data) => {
         const zoomLevel = data.zoomLevel;
         indicator.innerHTML = `Zoom: ${zoomLevel + 1}<br>Сетка: ${currentGridStep}`;
@@ -20,4 +18,4 @@ export function setupZoomIndicator(dispatcher, viewport) {
             indicator.style.opacity = '0';
         }, 2000);
     });
-}
+}

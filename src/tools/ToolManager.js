@@ -3,7 +3,7 @@ class ToolManager {
         this.tools = {};
         this.activeTool = null;
         this.dispatcher = null;
-        this.coordinateMapper = null;
+        this.coordinateMapper = null; // возвращаем
         this.actionLog = null;
     }
 
@@ -53,31 +53,27 @@ class ToolManager {
 
         if (!toolResult) return null;
 
-        // Переводим координаты в миллиметры через CoordinateMapper
-        let worldResult = toolResult;
-        if (this.coordinateMapper) {
-            this.coordinateMapper.remember(data.x, data.y);
-            worldResult = this.coordinateMapper.translateToolResultToWorld(toolResult);
-        }
-
-        // Отправляем миллиметры в диспетчер
+        // Отправляем миллиметры в диспетчер (toolResult уже в мм)
         if (this.dispatcher) {
             this.dispatcher.emit('toolResult', {
                 gesture: gesture,
-                toolResult: worldResult
+                toolResult: toolResult
             });
         }
 
-        // При pointerup — отправляем в ActionLog (миллиметры)
+        // При pointerup — отправляем в ActionLog только валидные точки
         if (gesture === 'pointerup' && this.actionLog && this.coordinateMapper) {
-            this.actionLog.addCommand('wallCreated', {
-                pointStart: { x: worldResult.startX, y: worldResult.startY },
-                pointEnd: { x: worldResult.endX, y: worldResult.endY }
-            });
+            if (this.coordinateMapper.isValidWorldPoint(toolResult.startX, toolResult.startY) &&
+                this.coordinateMapper.isValidWorldPoint(toolResult.endX, toolResult.endY)) {
+                this.actionLog.addCommand('wallCreated', {
+                    pointStart: { x: toolResult.startX, y: toolResult.startY },
+                    pointEnd: { x: toolResult.endX, y: toolResult.endY }
+                });
+            }
         }
 
         return toolResult;
     }
 }
 
-export default ToolManager;
+export default ToolManager;

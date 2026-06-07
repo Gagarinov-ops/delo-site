@@ -2,14 +2,14 @@ class PencilTool {
     constructor() {
         this.name = 'pencil';
         this.state = 'IDLE';          // IDLE | DRAWING
-        this.startPoint = null;       // экранные пиксели { x, y }
+        this.startPoint = null;       // мировые миллиметры { x, y }
     }
 
     handleGesture(gesture, data) {
         if (gesture === 'pointerdown') {
             if (this.state !== 'IDLE') return null;
             this.state = 'DRAWING';
-            this.startPoint = { x: data.x, y: data.y };
+            this.startPoint = { x: data.x, y: data.y }; // теперь в миллиметрах
             return { action: 'started', startX: this.startPoint.x, startY: this.startPoint.y };
 
         } else if (gesture === 'pointermove') {
@@ -18,7 +18,7 @@ class PencilTool {
                 action: 'drawing',
                 startX: this.startPoint.x,
                 startY: this.startPoint.y,
-                currentX: data.x,
+                currentX: data.x, // миллиметры
                 currentY: data.y
             };
 
@@ -28,7 +28,7 @@ class PencilTool {
                 action: 'finished',
                 startX: this.startPoint.x,
                 startY: this.startPoint.y,
-                endX: data.x,
+                endX: data.x, // миллиметры
                 endY: data.y
             };
             this.state = 'IDLE';
@@ -40,4 +40,4 @@ class PencilTool {
     }
 }
 
-export default PencilTool;
+export default PencilTool;

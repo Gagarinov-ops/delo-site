@@ -1,5 +1,6 @@
 import Overlay from './Overlay.js';
 import MainCanvas from './MainCanvas.js';
+import HitTest from './HitTest.js';
 
 export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
     const container = document.getElementById('canvasContainer');
@@ -9,16 +10,26 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
 
     const overlay = new Overlay('overlayCanvas');
 
-    // Текущие параметры камеры (обновляются через cameraChanged)
-    let currentZoom = viewport.getZoom();
+    dispatcher.emit('gridConfig', [
+        { id: 'gridLayerFine', zoomMin: 0, zoomMax: 0, step: '1' },
+        { id: 'gridLayerMedium', zoomMin: 1, zoomMax: 4, step: '5' }
+    ]);
 
-    // Перевод миллиметров в координаты холста (пиксели)
-    function toCanvas(worldX, worldY) {
-        return {
-            x: worldX * currentZoom,
-            y: worldY * currentZoom
-        };
-    }
+    const hitTest = new HitTest(dispatcher, canvasDataCopy, viewport);
+
+    hitTest.onDrawPreview = (x1, y1, x2, y2) => {
+        overlay.clear();
+        overlay.drawDashedLine(x1, y1, x2, y2);
+    };
+    hitTest.onClearOverlay = () => {
+        overlay.clear();
+    };
+    hitTest.onDrawLine = (x1, y1, x2, y2) => {
+        mainCanvas.drawLine(x1, y1, x2, y2);
+    };
+    hitTest.onDrawPoint = (x, y) => {
+        mainCanvas.drawPoint(x, y);
+    };
 
     function updatePosition() {
         const { panX, panY } = viewport.getPan();
@@ -29,27 +40,6 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
         } else {
             overlayCanvas.style.pointerEvents = 'none';
         }
-    }
-
-    function redrawMainCanvas() {
-        const w = mainCanvas.canvas.width / dpr;
-        const h = mainCanvas.canvas.height / dpr;
-        mainCanvas.ctx.clearRect(0, 0, w, h);
-
-        Object.values(canvasDataCopy.walls).forEach(wall => {
-            const p1 = canvasDataCopy.getPoint(wall.pointStartId);
-            const p2 = canvasDataCopy.getPoint(wall.pointEndId);
-            if (p1 && p2) {
-                const screenP1 = toCanvas(p1.x, p1.y);
-                const screenP2 = toCanvas(p2.x, p2.y);
-                mainCanvas.drawLine(screenP1.x, screenP1.y, screenP2.x, screenP2.y);
-            }
-        });
-
-        Object.values(canvasDataCopy.points).forEach(point => {
-            const screenP = toCanvas(point.x, point.y);
-            mainCanvas.drawPoint(screenP.x, screenP.y);
-        });
     }
 
     function updateSize() {
@@ -74,56 +64,13 @@ export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
             overlay.clear();
         }
 
-        redrawMainCanvas();
+        hitTest.redrawAll();
     }
 
-    // Подписка на изменения камеры — обновляем параметры и перерисовываем
-    dispatcher.on('cameraChanged', (data) => {
-        currentZoom = data.zoom;
-
+    dispatcher.on('cameraChanged', () => {
         updateSize();
         updatePosition();
-        redrawMainCanvas();
     });
 
-    dispatcher.on('toolResult', (data) => {
-        if (!data.toolResult) return;
-
-        overlay.clear();
-
-        if (data.gesture === 'pointerup') {
-            return;
-        }
-
-        // Преобразуем миллиметры в координаты холста
-        const screenStart = toCanvas(data.toolResult.startX, data.toolResult.startY);
-        const screenCurrent = toCanvas(data.toolResult.currentX, data.toolResult.currentY);
-
-        // Рисуем пунктирное превью
-        overlay.drawDashedLine(
-            screenStart.x,
-            screenStart.y,
-            screenCurrent.x,
-            screenCurrent.y
-        );
-    });
-
-    dispatcher.on('commandApproved', (entry) => {
-        if (entry.type !== 'wallCreated') return;
-
-        const wall = canvasDataCopy.getWall(canvasDataCopy._lastAdded.wallId);
-        if (!wall) return;
-
-        const p1 = canvasDataCopy.getPoint(wall.pointStartId);
-        const p2 = canvasDataCopy.getPoint(wall.pointEndId);
-        if (!p1 || !p2) return;
-
-        const screenP1 = toCanvas(p1.x, p1.y);
-        const screenP2 = toCanvas(p2.x, p2.y);
-        mainCanvas.drawLine(screenP1.x, screenP1.y, screenP2.x, screenP2.y);
-        mainCanvas.drawPoint(screenP1.x, screenP1.y);
-        mainCanvas.drawPoint(screenP2.x, screenP2.y);
-    });
-
-    return { updatePosition, updateSize };
+    return { updatePosition, updateSize, hitTest };
 }

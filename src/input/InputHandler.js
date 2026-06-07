@@ -29,6 +29,11 @@ export class InputHandler {
         return container && container.contains(target);
     }
 
+    // Перевод экранных пикселей в мировые миллиметры
+    _toWorld(screenX, screenY) {
+        return this.viewport.toWorld(screenX, screenY);
+    }
+
     onWheel(e) {  
         e.preventDefault();  
         if (e.deltaY < 0) {  
@@ -44,7 +49,9 @@ export class InputHandler {
         if (e.isPrimary) {  
             if (window.toolManager && window.toolManager.getActiveName() !== 'cursor') {
                 if (this._isCanvasTarget(e.target)) {
-                    window.toolManager.handleGesture('pointerdown', { x: e.clientX, y: e.clientY });  
+                    // Передаём координаты в миллиметрах
+                    const world = this._toWorld(e.clientX, e.clientY);
+                    window.toolManager.handleGesture('pointerdown', { x: world.x, y: world.y });  
                     this._toolActive = true;
                 } else {
                     this._toolActive = false;
@@ -62,7 +69,9 @@ export class InputHandler {
 
     onPointerMove(e) {  
         if (this._toolActive && window.toolManager) {  
-            window.toolManager.handleGesture('pointermove', { x: e.clientX, y: e.clientY });  
+            // Передаём координаты в миллиметрах
+            const world = this._toWorld(e.clientX, e.clientY);
+            window.toolManager.handleGesture('pointermove', { x: world.x, y: world.y });  
             return;  
         }  
 
@@ -80,7 +89,9 @@ export class InputHandler {
 
     onPointerUp(e) {  
         if (this._toolActive && window.toolManager) {  
-            window.toolManager.handleGesture('pointerup', { x: e.clientX, y: e.clientY });  
+            // Передаём координаты в миллиметрах
+            const world = this._toWorld(e.clientX, e.clientY);
+            window.toolManager.handleGesture('pointerup', { x: world.x, y: world.y });  
             this._toolActive = false;  
             return;  
         }  
