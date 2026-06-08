@@ -14,12 +14,11 @@ class GraphAnalyzer {
         if (!startPointId) return [];
 
         const graph = this._buildGraph();
-        const visitedPoints = new Set();
         const path = { pointIds: [], wallIds: [] };
         const cycles = [];
         let steps = 0;
 
-        this._dfs(startPointId, null, graph, visitedPoints, path, cycles, steps);
+        this._dfs(startPointId, null, graph, path, cycles, steps);
 
         return cycles;
     }
@@ -45,32 +44,11 @@ class GraphAnalyzer {
         return graph;
     }
 
-    _dfs(currentPointId, fromWallId, graph, visitedPoints, path, cycles, steps) {
+    _dfs(currentPointId, fromWallId, graph, path, cycles, steps) {
         steps++;
         if (steps > this.MAX_GRAPH_STEPS) return;
 
-        const pointIndex = path.pointIds.indexOf(currentPointId);
-
-        if (pointIndex !== -1) {
-            const cyclePointIds = path.pointIds.slice(pointIndex);
-            const cycleWallIds = path.wallIds.slice(pointIndex);
-            
-            if (fromWallId) {
-                cycleWallIds.push(fromWallId);
-            }
-
-            const cycleKey = [...cyclePointIds].sort().join(',');
-            const isDuplicate = cycles.some(c => [...c.pointIds].sort().join(',') === cycleKey);
-
-            if (!isDuplicate) {
-                cycles.push({
-                    pointIds: cyclePointIds,
-                    wallIds: cycleWallIds
-                });
-            }
-            return;
-        }
-
+        // Добавляем точку и стену в путь
         path.pointIds.push(currentPointId);
         if (fromWallId) {
             path.wallIds.push(fromWallId);
@@ -78,10 +56,36 @@ class GraphAnalyzer {
 
         const neighbors = graph[currentPointId] || [];
         for (const neighbor of neighbors) {
+            // Не возвращаемся по той же стене
             if (neighbor.wallId === fromWallId) continue;
-            this._dfs(neighbor.pointId, neighbor.wallId, graph, visitedPoints, path, cycles, steps);
+
+            const pointIndex = path.pointIds.indexOf(neighbor.pointId);
+            if (pointIndex !== -1) {
+                // Нашли цикл: от pointIndex до конца пути
+                const cyclePointIds = path.pointIds.slice(pointIndex);
+                const cycleWallIds = path.wallIds.slice(pointIndex);
+                // Добавляем замыкающую стену
+                cycleWallIds.push(neighbor.wallId);
+
+                // Проверка на дубликат по ID стен
+                const cycleKey = [...cycleWallIds].sort().join(',');
+                const isDuplicate = cycles.some(c => [...c.wallIds].sort().join(',') === cycleKey);
+
+                if (!isDuplicate) {
+                    cycles.push({
+                        pointIds: cyclePointIds,
+                        wallIds: cycleWallIds
+                    });
+                }
+                // Не идём в эту точку повторно
+                continue;
+            }
+
+            // Идём дальше по неизведанному пути
+            this._dfs(neighbor.pointId, neighbor.wallId, graph, path, cycles, steps);
         }
 
+        // Откат: убираем текущую точку и стену из пути при возврате
         path.pointIds.pop();
         if (fromWallId) {
             path.wallIds.pop();

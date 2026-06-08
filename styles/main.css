@@ -1,4 +1,3 @@
-
 /* === Глобальный сброс и позиционирование === */  
 *, *::before, *::after {  
     margin: 0;  
@@ -17,14 +16,22 @@ body {
     background: #E0E0E0;  
 }  
 
+/* === Viewport — камера === */
+#viewport {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    transform-origin: 0 0;
+    z-index: 0;
+}
+
 /* === Контейнер канваса === */  
 #canvasContainer {  
-    position: fixed;  
-    top: 0;  
-    left: 0;  
-    transform-origin: 0 0;  
-    z-index: 0;  
-    background: #FFFFFF;  
+    position: absolute;
+    background: #FFFFFF;
 }  
 
 /* === Холсты === */  

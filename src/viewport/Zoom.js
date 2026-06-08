@@ -1,95 +1,106 @@
 export class Zoom {
-    constructor(initialZoom, maxZoom, dispatcher) {
-        this.initialZoom = initialZoom;
-        this.maxZoom = maxZoom;
-        this.minZoom = initialZoom;
+    // Константы внутри Zoom
+    static BASE_HEIGHT = 500;   // мм
+    static MIN_HEIGHT = 50;     // мм
+
+    constructor(initialZoom, screenW, screenH, worldW, worldH) {
+        this.baseHeight = Zoom.BASE_HEIGHT;
+        this.minHeight = Zoom.MIN_HEIGHT;
+        this.maxHeight = this.baseHeight / initialZoom;
+
+        this.panX = 0;
+        this.panY = 0;
         this.currentZoomLevel = 0;
+        this.levels = [];
+
         this._animating = false;
         this._pendingLevel = undefined;
-        this._onFrame = null;
-        this.zoom = initialZoom;
-        this.zoomLevels = [initialZoom];
 
-        if (dispatcher) {
-            dispatcher.on('gridConfig', (config) => this._buildLevels(config));
-        }
+        this._buildLevels();
+        // Начальный pan — центр мира
+        this._centerOnWorld(screenW, screenH, worldW, worldH);
     }
 
-    setOnFrame(fn) {
-        this._onFrame = fn;
-    }
-
-    _buildLevels(config) {
-        const levels = new Set();
-        config.forEach(layer => {
-            for (let i = layer.zoomMin; i <= layer.zoomMax; i++) {
-                levels.add(i);
-            }
-        });
-
-        const sortedLevels = [...levels].sort((a, b) => a - b);
-        const levelCount = sortedLevels.length;
-
-        if (levelCount === 1) {
-            this.zoomLevels = [this.maxZoom];
-            this.currentZoomLevel = 0;
-            this.zoom = this.maxZoom;
-            return;
-        }
-
-        // Равномерное распределение уровней зума
-        this.zoomLevels = [];
-        const ratio = Math.pow(this.maxZoom / this.initialZoom, 1 / (levelCount - 1));
+    _buildLevels() {
+        const levelCount = 5;
+        const ratio = Math.pow(this.maxHeight / this.minHeight, 1 / (levelCount - 1));
+        this.levels = [];
         for (let i = 0; i < levelCount; i++) {
-            this.zoomLevels.push(this.maxZoom / Math.pow(ratio, i));
+            const height = this.minHeight * Math.pow(ratio, i);
+            this.levels.push({ index: i, height });
         }
-        this.zoomLevels[levelCount - 1] = this.initialZoom;
-
+        this.levels[0].height = this.minHeight;
+        this.levels[levelCount - 1].height = this.maxHeight;
         this.currentZoomLevel = levelCount - 1;
-        this.zoom = this.zoomLevels[this.currentZoomLevel];
     }
 
-    zoomIn() {
+    _centerOnWorld(screenW, screenH, worldW, worldH) {
+        const zoom = this.baseHeight / this.getCameraHeight();
+        this.panX = (screenW / 2) / zoom - worldW / 2;
+        this.panY = (screenH / 2) / zoom - worldH / 2;
+    }
+
+    getCurrentLevel() { return this.currentZoomLevel; }
+    getCameraHeight() { return this.levels[this.currentZoomLevel].height; }
+    getBaseHeight() { return this.baseHeight; }
+    getPan() { return { panX: this.panX, panY: this.panY }; }
+
+    pan(dx, dy) {
+        this.panX += dx;
+        this.panY += dy;
+    }
+
+    zoomIn(screenW, screenH, worldW, worldH) {
         const target = this.currentZoomLevel - 1;
         if (target < 0) return;
-        this._requestLevel(target);
+        this._requestLevel(target, screenW, screenH, worldW, worldH);
     }
 
-    zoomOut() {
+    zoomOut(screenW, screenH, worldW, worldH) {
         const target = this.currentZoomLevel + 1;
-        if (target >= this.zoomLevels.length) return;
-        this._requestLevel(target);
+        if (target >= this.levels.length) return;
+        this._requestLevel(target, screenW, screenH, worldW, worldH);
     }
 
-    _requestLevel(targetLevel) {
+    _requestLevel(targetLevel, screenW, screenH, worldW, worldH) {
         if (this._animating) {
             this._pendingLevel = targetLevel;
             return;
         }
         this._animating = true;
-        this._runAnimation(targetLevel);
+        this._runAnimation(targetLevel, screenW, screenH, worldW, worldH);
     }
 
-    _runAnimation(targetLevel) {
-        this.zoom = this.zoomLevels[targetLevel];
+    _runAnimation(targetLevel, screenW, screenH, worldW, worldH) {
+        // Пересчитываем pan, чтобы удержать центр экрана на той же мировой точке
+        const oldZoom = this.baseHeight / this.getCameraHeight();
+        const worldCX = (screenW / 2) / oldZoom - this.panX;
+        const worldCY = (screenH / 2) / oldZoom - this.panY;
+
         this.currentZoomLevel = targetLevel;
+        const newZoom = this.baseHeight / this.getCameraHeight();
+        this.panX = (screenW / 2) / newZoom - worldCX;
+        this.panY = (screenH / 2) / newZoom - worldCY;
+
         this._animating = false;
 
         if (this._pendingLevel !== undefined) {
             const pending = this._pendingLevel;
             this._pendingLevel = undefined;
-            this._runAnimation(pending);
+            this._runAnimation(pending, screenW, screenH, worldW, worldH);
         }
     }
 
-    reset() {
-        this.zoom = this.initialZoom;
-        this.currentZoomLevel = this.zoomLevels.length - 1;
-        this._animating = false;
-        this._pendingLevel = undefined;
+    rebuild(initialZoom, screenW, screenH, worldW, worldH) {
+        this.maxHeight = this.baseHeight / initialZoom;
+        this._buildLevels();
+        this._centerOnWorld(screenW, screenH, worldW, worldH);
     }
 
-    getCurrentLevel() {
-        return this.currentZoomLevel;
+    reset(screenW, screenH, worldW, worldH) {
+        this.currentZoomLevel = this.levels.length - 1;
+        this._animating = false;
+        this._pendingLevel = undefined;
+        this._centerOnWorld(screenW, screenH, worldW, worldH);
     }
 }

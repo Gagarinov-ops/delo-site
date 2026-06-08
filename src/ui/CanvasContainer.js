@@ -1,76 +1,71 @@
-import Overlay from './Overlay.js';
+import GridCanvas from './GridCanvas.js';
 import MainCanvas from './MainCanvas.js';
+import Overlay from './Overlay.js';
+import CanvasDataCopy from '../core/data/CanvasDataCopy.js';
 import HitTest from './HitTest.js';
+import LayerManager from './LayerManager.js';
+import DuplicateValidator from './DuplicateValidator.js';
 
-export function setupCanvasContainer(viewport, dispatcher, canvasDataCopy) {
+export function setupCanvasContainer(dispatcher) {
     const container = document.getElementById('canvasContainer');
-    const mainCanvas = new MainCanvas('mainCanvas');
-    const overlayCanvas = document.getElementById('overlayCanvas');
-    const dpr = window.devicePixelRatio || 1;
+    const width = 297;
+    const height = 297;
 
-    const overlay = new Overlay('overlayCanvas');
+    container.style.width = width + 'px';
+    container.style.height = height + 'px';
 
-    dispatcher.emit('gridConfig', [
-        { id: 'gridLayerFine', zoomMin: 0, zoomMax: 0, step: '1' },
-        { id: 'gridLayerMedium', zoomMin: 1, zoomMax: 4, step: '5' }
-    ]);
-
-    const hitTest = new HitTest(dispatcher, canvasDataCopy, viewport);
-
-    hitTest.onDrawPreview = (x1, y1, x2, y2) => {
-        overlay.clear();
-        overlay.drawDashedLine(x1, y1, x2, y2);
-    };
-    hitTest.onClearOverlay = () => {
-        overlay.clear();
-    };
-    hitTest.onDrawLine = (x1, y1, x2, y2) => {
-        mainCanvas.drawLine(x1, y1, x2, y2);
-    };
-    hitTest.onDrawPoint = (x, y) => {
-        mainCanvas.drawPoint(x, y);
-    };
-
-    function updatePosition() {
-        const { panX, panY } = viewport.getPan();
-        container.style.transform = `translate(${panX}px, ${panY}px)`;
-
-        if (window.toolManager && window.toolManager.getActiveName() !== 'cursor') {
-            overlayCanvas.style.pointerEvents = 'auto';
-        } else {
-            overlayCanvas.style.pointerEvents = 'none';
+    const canvasData = {
+        size: { width, height },
+        corners: {
+            topLeft:     { x: 0, y: 0 },
+            topRight:    { x: width, y: 0 },
+            bottomLeft:  { x: 0, y: height },
+            bottomRight: { x: width, y: height },
+            center:      { x: width / 2, y: height / 2 }
         }
-    }
+    };
 
-    function updateSize() {
-        const zoom = viewport.getZoom();
-        const widthPx = viewport.worldWidth * zoom;
-        const heightPx = viewport.worldHeight * zoom;
+    // Слои — подпишутся на canvasDefined сами
+    const gridCanvas = new GridCanvas(dispatcher);
+    const mainCanvas = new MainCanvas(dispatcher, 'mainCanvas');
+    const overlay = new Overlay(dispatcher, 'overlayCanvas');
 
-        container.style.width = widthPx + 'px';
-        container.style.height = heightPx + 'px';
+    // Данные — синглтон
+    const canvasDataCopy = CanvasDataCopy;
 
-        const canvasWidthPhys = widthPx * dpr;
-        const canvasHeightPhys = heightPx * dpr;
-        mainCanvas.canvas.width = canvasWidthPhys;
-        mainCanvas.canvas.height = canvasHeightPhys;
-        overlayCanvas.width = canvasWidthPhys;
-        overlayCanvas.height = canvasHeightPhys;
+    // HitTest + DuplicateValidator
+    const duplicateValidator = new DuplicateValidator(canvasDataCopy);
+    const hitTest = new HitTest(dispatcher, canvasDataCopy);
 
-        mainCanvas.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        const ctxOverlay = overlayCanvas.getContext('2d');
-        if (ctxOverlay) {
-            ctxOverlay.setTransform(dpr, 0, 0, dpr, 0, 0);
-            overlay.clear();
+    // LayerManager
+    const layerManager = new LayerManager(mainCanvas, overlay);
+    hitTest.setLayerManager = layerManager;
+    layerManager.init(canvasDataCopy, hitTest);
+
+    // toolResult
+    dispatcher.on('toolResult', (data) => {
+        if (data.gesture === 'pointerup' && data.toolResult) {
+            const snappedStart = hitTest.snap(data.toolResult.startX, data.toolResult.startY);
+            const snappedEnd = hitTest.snap(data.toolResult.endX, data.toolResult.endY);
+
+            if (duplicateValidator.isDuplicateWall(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y) ||
+                duplicateValidator.isCollinearWithExistingWall(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y)) {
+                return;
+            }
+
+            const intersections = hitTest.detectAndSplit(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y);
+            if (intersections) {
+                canvasDataCopy.applyWallSplit(intersections);
+                dispatcher.emit('wallSplit', { intersections });
+            } else {
+                canvasDataCopy.saveFromToolResult({ ...data.toolResult, startX: snappedStart.x, startY: snappedStart.y, endX: snappedEnd.x, endY: snappedEnd.y });
+                dispatcher.emit('wallCreated', { pointStart: { x: snappedStart.x, y: snappedStart.y }, pointEnd: { x: snappedEnd.x, y: snappedEnd.y } });
+            }
         }
-
-        hitTest.redrawAll();
-    }
-
-    dispatcher.on('cameraChanged', () => {
-        updateSize();
-        updatePosition();
     });
 
-    return { updatePosition, updateSize, hitTest };
+    dispatcher.on('commandRejected', () => canvasDataCopy.removeLast());
+
+    // Эмитим canvasDefined — слои и остальные подписчики получат размеры
+    dispatcher.emit('canvasDefined', canvasData);
 }

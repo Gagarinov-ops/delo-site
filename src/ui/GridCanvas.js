@@ -1,89 +1,64 @@
-import { Viewport } from '../viewport/Viewport.js';
-
 class GridCanvas {
     constructor(dispatcher) {
         this.canvas = document.getElementById('gridCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.dpr = window.devicePixelRatio || 1;
-        this.zoom = 1;
         this.worldWidth = 297;
         this.worldHeight = 297;
-        this.viewport = Viewport.getInstance();
-
+        this.currentZoomLevel = 4;
         this.dispatcher = dispatcher;
-        this.dispatcher.on('cameraChanged', this._onCameraChanged.bind(this));
+
+        this.dispatcher.on('canvasDefined', (data) => {
+            this.worldWidth = data.size.width;
+            this.worldHeight = data.size.height;
+            this._resize();
+            this.draw();
+        });
+
+        this.dispatcher.on('cameraChanged', (data) => {
+            if (data.isResize) {
+                this.dpr = data.dpr || this.dpr;
+                this.worldWidth = data.worldWidth;
+                this.worldHeight = data.worldHeight;
+                this._resize();
+            }
+            if (this.currentZoomLevel !== data.currentZoomLevel || data.isResize) {
+                this.currentZoomLevel = data.currentZoomLevel;
+                this.draw();
+            }
+        });
     }
 
-    _onCameraChanged(data) {
-        this.zoom = data.zoom;
-        // Размеры холста берём из Viewport
-        this.worldWidth = this.viewport.worldWidth;
-        this.worldHeight = this.viewport.worldHeight;
-
-        const w = this.worldWidth * this.zoom;
-        const h = this.worldHeight * this.zoom;
-        this.resize(w, h);
-    }
-
-    resize(w, h) {
-        this.canvas.width = w * this.dpr;
-        this.canvas.height = h * this.dpr;
-        this.canvas.style.width = w + 'px';
-        this.canvas.style.height = h + 'px';
-        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-        this.draw();
+    _resize() {
+        this.canvas.width = this.worldWidth * this.dpr;
+        this.canvas.height = this.worldHeight * this.dpr;
+        this.canvas.style.width = this.worldWidth + 'px';
+        this.canvas.style.height = this.worldHeight + 'px';
     }
 
     draw() {
         const ctx = this.ctx;
-        const w = this.canvas.width / this.dpr;
-        const h = this.canvas.height / this.dpr;
-        const level = this.viewport.getCurrentZoomLevel();
+        const w = this.canvas.width;
+        const h = this.canvas.height;
 
         ctx.clearRect(0, 0, w, h);
-
-        if (level === 0) {
-            this._drawGridLines(ctx, 1, '#FFD700', w, h);
-        } else if (level === 1) {
-            this._drawGridLines(ctx, 1, '#CCCCCC', w, h);
-            this._drawGridLines(ctx, 5, '#FFD700', w, h);
-        } else {
-            this._drawGridLines(ctx, 5, '#FFD700', w, h);
-        }
-
-        const gridStep = (level === 0 || level === 1) ? '1 мм' : '5 мм';
-        this.dispatcher.emit('gridChanged', { step: gridStep });
-    }
-
-    _drawGridLines(ctx, stepMM, color, w, h) {
-        const startX = 0;
-        const startY = 0;
-        const endX = this.worldWidth;
-        const endY = this.worldHeight;
-
-        ctx.strokeStyle = color;
         ctx.lineWidth = 0.5;
+        ctx.strokeStyle = '#FFD700';
+
+        const stepPx = 5 * this.dpr;
+
         ctx.beginPath();
-
-        // Вертикальные линии
-        for (let wx = startX; wx <= endX; wx += stepMM) {
-            const sx = wx * this.zoom;
-            if (sx >= 0 && sx <= w) {
-                ctx.moveTo(sx, 0);
-                ctx.lineTo(sx, h);
-            }
+        for (let x = 0; x <= w; x += stepPx) {
+            ctx.moveTo(x + 0.5, 0);
+            ctx.lineTo(x + 0.5, h);
         }
-
-        // Горизонтальные линии
-        for (let wy = startY; wy <= endY; wy += stepMM) {
-            const sy = wy * this.zoom;
-            if (sy >= 0 && sy <= h) {
-                ctx.moveTo(0, sy);
-                ctx.lineTo(w, sy);
-            }
+        for (let y = 0; y <= h; y += stepPx) {
+            ctx.moveTo(0, y + 0.5);
+            ctx.lineTo(w, y + 0.5);
         }
-
         ctx.stroke();
+
+        this.dispatcher.emit('gridChanged', { step: '5 мм' });
     }
 }
 

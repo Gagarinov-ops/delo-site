@@ -8,9 +8,9 @@ export function setupZoomIndicator(dispatcher) {
         currentGridStep = data.step;
     });
 
-    dispatcher.on('zoomChanged', (data) => {
-        const zoomLevel = data.zoomLevel;
-        indicator.innerHTML = `Zoom: ${zoomLevel + 1}<br>Сетка: ${currentGridStep}`;
+    dispatcher.on('cameraChanged', (data) => {
+        const level = data.currentZoomLevel;
+        indicator.innerHTML = `Zoom: ${level + 1}<br>Сетка: ${currentGridStep}`;
         indicator.style.opacity = '1';
 
         clearTimeout(window._zoomIndicatorTimeout);
@@ -18,4 +18,4 @@ export function setupZoomIndicator(dispatcher) {
             indicator.style.opacity = '0';
         }, 2000);
     });
-}
+}

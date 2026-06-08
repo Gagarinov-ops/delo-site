@@ -10,19 +10,20 @@ class CoordinateMapper {
         this._lastScreenX = 0;
         this._lastScreenY = 0;
 
-        this.dispatcher.on('cameraChanged', this._onCameraChanged.bind(this));
+        // Подписываемся только на toolGesture
         this.dispatcher.on('toolGesture', this._onToolGesture.bind(this));
+    }
+
+    // Новый метод — прямой вызов от Viewport
+    updateCamera(data) {
+        this.zoom = data.zoom;
+        this.panX = data.panX;
+        this.panY = data.panY;
     }
 
     remember(screenX, screenY) {
         this._lastScreenX = screenX;
         this._lastScreenY = screenY;
-    }
-
-    _onCameraChanged(data) {
-        this.zoom = data.zoom;
-        this.panX = data.panX;
-        this.panY = data.panY;
     }
 
     _onToolGesture(data) {
@@ -45,7 +46,6 @@ class CoordinateMapper {
         }
     }
 
-    // Публичный метод для проверки валидности мировых координат
     isValidWorldPoint(x, y) {
         return isValidWorldPoint(x, y);
     }
