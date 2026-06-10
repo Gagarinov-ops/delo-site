@@ -1,59 +1,32 @@
 class HitTest {
-    constructor(dispatcher, canvasDataCopy) {
+    constructor(dispatcher, canvasDataCopy, duplicateValidator) {
         this.dispatcher = dispatcher;
         this.canvasDataCopy = canvasDataCopy;
+        this.duplicateValidator = duplicateValidator;
         this.currentZoomLevel = 4;
-        this.layerManager = null;
 
-        this.dispatcher.on('cameraChanged', (data) => {
-            this.currentZoomLevel = data.currentZoomLevel;
-        });
+        // Временный объект для накопления данных жеста
+        this._pendingWall = null;
+
         this.dispatcher.on('toolResult', this._onToolResult.bind(this));
-        this.dispatcher.on('commandApproved', this._onCommandApproved.bind(this));
         this.dispatcher.on('zoomChanged', (data) => {
             this.currentZoomLevel = data.zoomLevel;
         });
     }
 
-    setLayerManager(lm) {
-        this.layerManager = lm;
-    }
-
-    toScreen(worldX, worldY) {
-        // canvas фиксированного размера, масштабирование через CSS
-        return { x: worldX, y: worldY };
+    // Отправляет запрос в CanvasDataCopy через диспетчер, возвращает ближайшую точку или null
+    findNearestPoint(worldX, worldY, radius = 5) {
+        const request = { x: worldX, y: worldY, radius, result: null };
+        this.dispatcher.emit('hitTest:findNearestPoint', request);
+        return request.result; // синхронно заполняется подписчиком (CanvasDataCopy)
     }
 
     snapToGrid(worldX, worldY) {
-        if (this.currentZoomLevel >= 2) {
-            const step = 5;
-            return {
-                x: Math.round(worldX / step) * step,
-                y: Math.round(worldY / step) * step
-            };
-        } else if (this.currentZoomLevel === 1) {
-            const step5 = 5;
-            const step1 = 1;
-            const to5 = {
-                x: Math.round(worldX / step5) * step5,
-                y: Math.round(worldY / step5) * step5
-            };
-            const dist5 = Math.hypot(to5.x - worldX, to5.y - worldY);
-            if (dist5 <= 5 * 0.5) {
-                return to5;
-            } else {
-                return {
-                    x: Math.round(worldX / step1) * step1,
-                    y: Math.round(worldY / step1) * step1
-                };
-            }
-        } else {
-            const step = 1;
-            return {
-                x: Math.round(worldX / step) * step,
-                y: Math.round(worldY / step) * step
-            };
-        }
+        const step = 5;
+        return {
+            x: Math.round(worldX / step) * step,
+            y: Math.round(worldY / step) * step
+        };
     }
 
     snap(worldX, worldY) {
@@ -104,43 +77,109 @@ class HitTest {
     _onToolResult(data) {
         if (!data.toolResult) return;
 
-        if (data.gesture === 'pointerdown') {
-            if (this.layerManager) this.layerManager.startDrawing();
-            return;
-        }
+        const gesture = data.gesture;
+        const toolData = data.toolResult;
 
-        if (data.gesture === 'pointerup') {
-            if (this.layerManager) this.layerManager.finishDrawing();
-            return;
-        }
-
-        const snappedStart = this.snap(data.toolResult.startX, data.toolResult.startY);
-        const snappedCurrent = this.snap(data.toolResult.currentX, data.toolResult.currentY);
-
-        const screenStart = this.toScreen(snappedStart.x, snappedStart.y);
-        const screenCurrent = this.toScreen(snappedCurrent.x, snappedCurrent.y);
-
-        if (this.layerManager) {
-            this.layerManager.drawPreview(screenStart.x, screenStart.y, screenCurrent.x, screenCurrent.y);
-        }
-    }
-
-    _onCommandApproved(entry) {
-        if (entry.type === 'wallCreated') {
-            const wall = this.canvasDataCopy.getWall(this.canvasDataCopy._lastAdded.wallId);
-            if (!wall) return;
-            const p1 = this.canvasDataCopy.getPoint(wall.pointStartId);
-            const p2 = this.canvasDataCopy.getPoint(wall.pointEndId);
-            if (!p1 || !p2) return;
-            const screenP1 = this.toScreen(p1.x, p1.y);
-            const screenP2 = this.toScreen(p2.x, p2.y);
-            if (this.layerManager) {
-                this.layerManager.drawWall(screenP1.x, screenP1.y, screenP2.x, screenP2.y);
-                this.layerManager.drawPoint(screenP1.x, screenP1.y);
-                this.layerManager.drawPoint(screenP2.x, screenP2.y);
+        if (gesture === 'pointerdown') {
+            // 1. Поиск существующей точки через событие
+            const existing = this.findNearestPoint(toolData.startX, toolData.startY);
+            let finalX, finalY;
+            if (existing) {
+                finalX = existing.x;
+                finalY = existing.y;
+            } else {
+                // 2. Если нет — привязка к узлу сетки
+                const snapped = this.snap(toolData.startX, toolData.startY);
+                finalX = snapped.x;
+                finalY = snapped.y;
             }
-        } else if (entry.type === 'wallSplit') {
-            if (this.layerManager) this.layerManager.redrawAll();
+            this._pendingWall = {
+                startX: finalX,
+                startY: finalY,
+                endX: null,
+                endY: null
+            };
+            // Событие для LayerManager: начальная точка определена
+            this.dispatcher.emit('startDraft', {
+                point: { x: finalX, y: finalY }
+            });
+            return;
+        }
+
+        if (gesture === 'pointermove' && toolData.currentX !== undefined) {
+            if (!this._pendingWall) return;
+            const snappedCurrent = this.snap(toolData.currentX, toolData.currentY);
+            // Событие для LayerManager: превью линии
+            this.dispatcher.emit('moveDraft', {
+                startX: this._pendingWall.startX,
+                startY: this._pendingWall.startY,
+                currentX: snappedCurrent.x,
+                currentY: snappedCurrent.y
+            });
+            return;
+        }
+
+        if (gesture === 'pointerup' && toolData.endX !== undefined) {
+            if (!this._pendingWall) return;
+
+            // Поиск существующей точки для конечной координаты
+            const existingEnd = this.findNearestPoint(toolData.endX, toolData.endY);
+            let finalEndX, finalEndY;
+            if (existingEnd) {
+                finalEndX = existingEnd.x;
+                finalEndY = existingEnd.y;
+            } else {
+                const snappedEnd = this.snap(toolData.endX, toolData.endY);
+                finalEndX = snappedEnd.x;
+                finalEndY = snappedEnd.y;
+            }
+
+            this._pendingWall.endX = finalEndX;
+            this._pendingWall.endY = finalEndY;
+
+            const startX = this._pendingWall.startX;
+            const startY = this._pendingWall.startY;
+            const endX = finalEndX;
+            const endY = finalEndY;
+
+            // Валидация дубликатов
+            if (this.duplicateValidator) {
+                if (this.duplicateValidator.isDuplicateWall(startX, startY, endX, endY) ||
+                    this.duplicateValidator.isCollinearWithExistingWall(startX, startY, endX, endY)) {
+                    // Сообщаем LayerManager отменить превью
+                    this.dispatcher.emit('cancelDraft');
+                    this._pendingWall = null;
+                    return;
+                }
+            }
+
+            // Проверка пересечений
+            const intersections = this.detectAndSplit(startX, startY, endX, endY);
+            if (intersections) {
+                this.canvasDataCopy.applyWallSplit(intersections);
+                this.dispatcher.emit('wallSplit', { intersections });
+            } else {
+                this.canvasDataCopy.saveFromToolResult({ startX, startY, endX, endY });
+                this.dispatcher.emit('wallCreated', {
+                    pointStart: { x: startX, y: startY },
+                    pointEnd: { x: endX, y: endY }
+                });
+            }
+
+            // Событие для LayerManager: фиксация стены
+            this.dispatcher.emit('endDraft', {
+                startX, startY,
+                endX, endY
+            });
+
+            this._pendingWall = null;
+            return;
+        }
+
+        // Если pointerup без endX (отмена жеста)
+        if (gesture === 'pointerup') {
+            this.dispatcher.emit('cancelDraft');
+            this._pendingWall = null;
         }
     }
 }

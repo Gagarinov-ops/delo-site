@@ -3,40 +3,39 @@ class GridCanvas {
         this.canvas = document.getElementById('gridCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.dpr = window.devicePixelRatio || 1;
-        this.worldWidth = 297;
-        this.worldHeight = 297;
-        this.currentZoomLevel = 4;
         this.dispatcher = dispatcher;
+        this.planeState = null;
 
-        this.dispatcher.on('canvasDefined', (data) => {
-            this.worldWidth = data.size.width;
-            this.worldHeight = data.size.height;
+        this.dispatcher.on('containerPlaneReady', (planeState) => {
+            this.planeState = planeState;
             this._resize();
             this.draw();
         });
 
-        this.dispatcher.on('cameraChanged', (data) => {
-            if (data.isResize) {
-                this.dpr = data.dpr || this.dpr;
-                this.worldWidth = data.worldWidth;
-                this.worldHeight = data.worldHeight;
-                this._resize();
-            }
-            if (this.currentZoomLevel !== data.currentZoomLevel || data.isResize) {
-                this.currentZoomLevel = data.currentZoomLevel;
-                this.draw();
-            }
+        this.dispatcher.on('canvasDefined', (data) => {
+            this.worldWidth = data.size.width;
+            this.worldHeight = data.size.height;
+        });
+
+        this.dispatcher.on('planeUpdated', (data) => {
+            this.dpr = data.dpr || this.dpr;
+            this._resize();
+            this.draw();
         });
     }
 
     _resize() {
-        this.canvas.width = this.worldWidth * this.dpr;
-        this.canvas.height = this.worldHeight * this.dpr;
-        this.canvas.style.width = this.worldWidth + 'px';
-        this.canvas.style.height = this.worldHeight + 'px';
+        if (!this.planeState) return;
+        const width = this.planeState.visibleArea.maxX - this.planeState.visibleArea.minX;
+        const height = this.planeState.visibleArea.maxY - this.planeState.visibleArea.minY;
+        this.canvas.width = width * this.dpr;
+        this.canvas.height = height * this.dpr;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
     }
 
     draw() {
+        if (!this.planeState) return;
         const ctx = this.ctx;
         const w = this.canvas.width;
         const h = this.canvas.height;
@@ -45,7 +44,9 @@ class GridCanvas {
         ctx.lineWidth = 0.5;
         ctx.strokeStyle = '#FFD700';
 
-        const stepPx = 5 * this.dpr;
+        const stepMm = 5;
+        const pixelsPerMm = w / (this.planeState.visibleArea.maxX - this.planeState.visibleArea.minX);
+        const stepPx = stepMm * pixelsPerMm;
 
         ctx.beginPath();
         for (let x = 0; x <= w; x += stepPx) {

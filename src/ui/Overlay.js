@@ -4,17 +4,13 @@ class Overlay {
         this.ctx = this.canvas.getContext('2d');
         this.dpr = window.devicePixelRatio || 1;
 
-        // Подписываемся на размеры от контейнера
-        dispatcher.on('canvasDefined', (data) => {
-            const width = data.size.width;
-            const height = data.size.height;
-            this.dpr = window.devicePixelRatio || 1;
-            this.canvas.width = width * this.dpr;
-            this.canvas.height = height * this.dpr;
-            this.canvas.style.width = width + 'px';
-            this.canvas.style.height = height + 'px';
-            this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
-        });
+        const width = 297;
+        const height = 297;
+        this.canvas.width = width * this.dpr;
+        this.canvas.height = height * this.dpr;
+        this.canvas.style.width = width + 'px';
+        this.canvas.style.height = height + 'px';
+        this.ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     }
 
     clear() {

@@ -1,3 +1,4 @@
+import { ContainerCoordinatePlane } from './ContainerCoordinatePlane.js';
 import GridCanvas from './GridCanvas.js';
 import MainCanvas from './MainCanvas.js';
 import Overlay from './Overlay.js';
@@ -11,61 +12,45 @@ export function setupCanvasContainer(dispatcher) {
     const width = 297;
     const height = 297;
 
+    const plane = new ContainerCoordinatePlane(width, height, dispatcher);
+    const origin = plane.getOrigin();
+    const planeState = plane.getState();
+
+    window.containerPlane = plane;
+
+    container.style.position = 'absolute';
+    container.style.left = (origin.x - width / 2) + 'px';
+    container.style.top = (origin.y - height / 2) + 'px';
     container.style.width = width + 'px';
     container.style.height = height + 'px';
 
     const canvasData = {
         size: { width, height },
+        center: { x: 0, y: 0 },
         corners: {
-            topLeft:     { x: 0, y: 0 },
-            topRight:    { x: width, y: 0 },
-            bottomLeft:  { x: 0, y: height },
-            bottomRight: { x: width, y: height },
-            center:      { x: width / 2, y: height / 2 }
+            topLeft:     { x: -width / 2, y: -height / 2 },
+            topRight:    { x:  width / 2, y: -height / 2 },
+            bottomLeft:  { x: -width / 2, y:  height / 2 },
+            bottomRight: { x:  width / 2, y:  height / 2 }
         }
     };
 
-    // Слои — подпишутся на canvasDefined сами
+    // Слои
     const gridCanvas = new GridCanvas(dispatcher);
     const mainCanvas = new MainCanvas(dispatcher, 'mainCanvas');
     const overlay = new Overlay(dispatcher, 'overlayCanvas');
 
-    // Данные — синглтон
-    const canvasDataCopy = CanvasDataCopy;
+    dispatcher.emit('containerPlaneReady', planeState);
 
-    // HitTest + DuplicateValidator
+    // Данные (теперь создаём экземпляр класса)
+    const canvasDataCopy = new CanvasDataCopy(dispatcher);
+
+    // Валидация и обработка инструментов
     const duplicateValidator = new DuplicateValidator(canvasDataCopy);
-    const hitTest = new HitTest(dispatcher, canvasDataCopy);
+    const hitTest = new HitTest(dispatcher, canvasDataCopy, duplicateValidator);
 
-    // LayerManager
-    const layerManager = new LayerManager(mainCanvas, overlay);
-    hitTest.setLayerManager = layerManager;
-    layerManager.init(canvasDataCopy, hitTest);
+    // Управление слоями (теперь LayerManager получает dispatcher)
+    const layerManager = new LayerManager(mainCanvas, overlay, dispatcher);
 
-    // toolResult
-    dispatcher.on('toolResult', (data) => {
-        if (data.gesture === 'pointerup' && data.toolResult) {
-            const snappedStart = hitTest.snap(data.toolResult.startX, data.toolResult.startY);
-            const snappedEnd = hitTest.snap(data.toolResult.endX, data.toolResult.endY);
-
-            if (duplicateValidator.isDuplicateWall(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y) ||
-                duplicateValidator.isCollinearWithExistingWall(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y)) {
-                return;
-            }
-
-            const intersections = hitTest.detectAndSplit(snappedStart.x, snappedStart.y, snappedEnd.x, snappedEnd.y);
-            if (intersections) {
-                canvasDataCopy.applyWallSplit(intersections);
-                dispatcher.emit('wallSplit', { intersections });
-            } else {
-                canvasDataCopy.saveFromToolResult({ ...data.toolResult, startX: snappedStart.x, startY: snappedStart.y, endX: snappedEnd.x, endY: snappedEnd.y });
-                dispatcher.emit('wallCreated', { pointStart: { x: snappedStart.x, y: snappedStart.y }, pointEnd: { x: snappedEnd.x, y: snappedEnd.y } });
-            }
-        }
-    });
-
-    dispatcher.on('commandRejected', () => canvasDataCopy.removeLast());
-
-    // Эмитим canvasDefined — слои и остальные подписчики получат размеры
     dispatcher.emit('canvasDefined', canvasData);
 }

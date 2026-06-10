@@ -1,32 +1,53 @@
-const CanvasDataCopy = {
-    points: {},
-    walls: {},
-    rooms: {},
-    openings: {},
-    elements: {},
-    dimensionLines: {},
+class CanvasDataCopy {
+    constructor(dispatcher) {
+        this.dispatcher = dispatcher;
+        this.points = {};
+        this.walls = {};
+        this.rooms = {};
+        this.openings = {};
+        this.elements = {};
+        this.dimensionLines = {};
 
-    _pointSeq: 0,
-    _wallSeq: 0,
+        this._pointSeq = 0;
+        this._wallSeq = 0;
 
-    _lastAdded: {
-        pointIds: [],
-        wallId: null
-    },
+        this._lastAdded = {
+            pointIds: [],
+            wallId: null
+        };
 
-    // Кэш для режима редактирования
-    _editCache: {
-        active: false,
-        pointId: null,
-        wallIds: [],
-        originalCoords: null
-    },
+        this._editCache = {
+            active: false,
+            pointId: null,
+            wallIds: [],
+            originalCoords: null
+        };
+
+        // Подписка на запрос от HitTest
+        if (this.dispatcher) {
+            this.dispatcher.on('hitTest:findNearestPoint', (request) => {
+                let nearest = null;
+                let minDist = Infinity;
+                for (const id in this.points) {
+                    const p = this.points[id];
+                    const dx = p.x - request.x;
+                    const dy = p.y - request.y;
+                    const dist = Math.hypot(dx, dy);
+                    if (dist <= request.radius && dist < minDist) {
+                        minDist = dist;
+                        nearest = { id: p.id, x: p.x, y: p.y };
+                    }
+                }
+                request.result = nearest;
+            });
+        }
+    }
 
     addPoint(x, y) {
         const id = `p_${++this._pointSeq}`;
         this.points[id] = { id, x, y };
         return id;
-    },
+    }
 
     addWall(pointStartId, pointEndId) {
         const id = `w_${++this._wallSeq}`;
@@ -39,15 +60,15 @@ const CanvasDataCopy = {
             openingIds: []
         };
         return id;
-    },
+    }
 
     getPoint(id) {
         return this.points[id] || null;
-    },
+    }
 
     getWall(id) {
         return this.walls[id] || null;
-    },
+    }
 
     saveFromToolResult(toolResult) {
         const p1Id = this.addPoint(toolResult.startX, toolResult.startY);
@@ -56,7 +77,7 @@ const CanvasDataCopy = {
 
         this._lastAdded.pointIds = [p1Id, p2Id];
         this._lastAdded.wallId = wallId;
-    },
+    }
 
     removeLast() {
         if (this._lastAdded.wallId) {
@@ -64,7 +85,7 @@ const CanvasDataCopy = {
             this._lastAdded.pointIds.forEach(id => delete this.points[id]);
             this._lastAdded = { pointIds: [], wallId: null };
         }
-    },
+    }
 
     applyWallSplit(intersections) {
         intersections.forEach((intersection) => {
@@ -101,7 +122,7 @@ const CanvasDataCopy = {
             this.addWall(startPointId, pointId);
             this.addWall(pointId, endPointId);
         });
-    },
+    }
 
     _findOrCreatePointInCopy(x, y) {
         for (const id in this.points) {
@@ -112,6 +133,6 @@ const CanvasDataCopy = {
         }
         return this.addPoint(x, y);
     }
-};
+}
 
 export default CanvasDataCopy;

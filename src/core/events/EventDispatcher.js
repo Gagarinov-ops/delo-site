@@ -20,4 +20,3 @@ export class EventDispatcher {
         this._listeners[event].forEach(cb => cb(data));  
     }  
 }  
-

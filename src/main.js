@@ -4,7 +4,6 @@ import { InputHandler } from './input/InputHandler.js';
 import { setupCanvasContainer } from './ui/CanvasContainer.js';
 import { setupZoomIndicator } from './ui/ZoomIndicator.js';
 import { setupMenu } from './ui/Menu.js';
-import { setupResize } from './viewport/Resize.js';
 import { setupToast } from './ui/Toast.js';
 import Registry from './core/registry/Registry.js';
 import GeometryValidator from './core/registry/GeometryValidator.js';
@@ -13,15 +12,12 @@ import GraphAnalyzer from './core/registry/GraphAnalyzer.js';
 import CanvasData from './core/data/CanvasData.js';
 import ActionLog from './core/events/ActionLog.js';
 import ToolManager from './tools/ToolManager.js';
-import CursorTool from './tools/CursorTool.js';
-import PencilTool from './tools/PencilTool.js';
-import CoordinateMapper from './viewport/CoordinateMapper.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const dispatcher = new EventDispatcher();
 
     // ============================
-    // VIEWPORT — единая точка входа
+    // VIEWPORT
     // ============================
     const viewport = Viewport.getInstance();
     viewport.setDispatcher(dispatcher);
@@ -63,12 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.dispatcher = dispatcher;
 
     // ============================
-    // СЛОИ ОТРИСОВКИ — теперь внутри CanvasContainer
+    // СЛОИ ОТРИСОВКИ
     // ============================
-    const coordinateMapper = new CoordinateMapper(dispatcher);
-    viewport.setCoordinateMapper(coordinateMapper);
-    window.coordinateMapper = coordinateMapper;
-
     setupCanvasContainer(dispatcher);
 
     // ============================
@@ -76,23 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
     // ============================
     const toolManager = new ToolManager();
     toolManager.setDispatcher(dispatcher);
-    toolManager.setCoordinateMapper(coordinateMapper);
-    toolManager.register('cursor', new CursorTool());
-    toolManager.register('pencil', new PencilTool());
 
-    function activateTool(toolName) {
-        toolManager.activate(toolName);
-        document.querySelectorAll('.tool-btn[data-tool]').forEach(btn => btn.classList.remove('active'));
-        const activeBtn = document.querySelector(`.tool-btn[data-tool="${toolName}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
-    }
-
-    document.querySelector('[data-tool="cursor"]')?.addEventListener('click', () => activateTool('cursor'));
-    document.querySelector('[data-tool="pencil"]')?.addEventListener('click', () => activateTool('pencil'));
-    activateTool('cursor');
-    window.toolManager = toolManager;
-
-    const inputHandler = new InputHandler((type, data) => dispatcher.emit(type, data));
+    const inputHandler = new InputHandler(dispatcher);
 
     // ============================
     // UI
@@ -100,7 +77,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMenu();
     setupToast(dispatcher);
     setupZoomIndicator(dispatcher);
-    setupResize(viewport, dispatcher);
 
     window.viewport = viewport;
     console.log('EventDispatcher, слои сетки и индикатор готовы');
