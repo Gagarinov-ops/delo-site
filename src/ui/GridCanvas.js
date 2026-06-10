@@ -44,16 +44,25 @@ class GridCanvas {
         ctx.lineWidth = 0.5;
         ctx.strokeStyle = '#FFD700';
 
+        const visibleArea = this.planeState.visibleArea;
         const stepMm = 5;
-        const pixelsPerMm = w / (this.planeState.visibleArea.maxX - this.planeState.visibleArea.minX);
+        const pixelsPerMm = w / (visibleArea.maxX - visibleArea.minX);
+
+        // Вычисляем начальную мировую координату X, кратную шагу сетки
+        const startWorldX = Math.ceil(visibleArea.minX / stepMm) * stepMm;
+        const startX = (startWorldX - visibleArea.minX) * pixelsPerMm;
         const stepPx = stepMm * pixelsPerMm;
 
+        // Вычисляем начальную мировую координату Y, кратную шагу сетки
+        const startWorldY = Math.ceil(visibleArea.minY / stepMm) * stepMm;
+        const startY = (startWorldY - visibleArea.minY) * pixelsPerMm;
+
         ctx.beginPath();
-        for (let x = 0; x <= w; x += stepPx) {
+        for (let x = startX; x <= w; x += stepPx) {
             ctx.moveTo(x + 0.5, 0);
             ctx.lineTo(x + 0.5, h);
         }
-        for (let y = 0; y <= h; y += stepPx) {
+        for (let y = startY; y <= h; y += stepPx) {
             ctx.moveTo(0, y + 0.5);
             ctx.lineTo(w, y + 0.5);
         }

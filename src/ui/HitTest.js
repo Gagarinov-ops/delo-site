@@ -9,6 +9,7 @@ class HitTest {
         this._pendingWall = null;
 
         this.dispatcher.on('toolResult', this._onToolResult.bind(this));
+        this.dispatcher.on('cancelDraft', this._onCancelDraft.bind(this)); // Новая подписка
         this.dispatcher.on('zoomChanged', (data) => {
             this.currentZoomLevel = data.zoomLevel;
         });
@@ -147,7 +148,7 @@ class HitTest {
                 if (this.duplicateValidator.isDuplicateWall(startX, startY, endX, endY) ||
                     this.duplicateValidator.isCollinearWithExistingWall(startX, startY, endX, endY)) {
                     // Сообщаем LayerManager отменить превью
-                    this.dispatcher.emit('cancelDraft');
+                    this.dispatcher.emit('draftCancelled');
                     this._pendingWall = null;
                     return;
                 }
@@ -178,9 +179,17 @@ class HitTest {
 
         // Если pointerup без endX (отмена жеста)
         if (gesture === 'pointerup') {
-            this.dispatcher.emit('cancelDraft');
+            this.dispatcher.emit('draftCancelled');
             this._pendingWall = null;
         }
+    }
+
+    // Новая команда отмены
+    _onCancelDraft(data) {
+        // 1. Сбрасываем временный объект (откат состояния)
+        this._pendingWall = null;
+        // 2. Дублируем приказ дальше — для LayerManager
+        this.dispatcher.emit('draftCancelled');
     }
 }
 

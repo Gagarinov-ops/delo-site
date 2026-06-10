@@ -3,72 +3,68 @@ class LayerManager {
         this.mainCanvas = mainCanvas;
         this.overlay = overlay;
         this.dispatcher = dispatcher;
-        this.visibleArea = null; // { minX, maxX, minY, maxY } в миллиметрах
-        this._planeReady = false;
 
-        // Получение видимой области от контейнера
-        this.dispatcher.on('containerPlaneUpdated', (data) => {
-            if (data && data.visibleArea) {
-                this.visibleArea = data.visibleArea;
-                this._planeReady = true;
-            }
-        });
+        // Размеры контейнера в миллиметрах (константы)
+        this.containerWidth = 297;
+        this.containerHeight = 297;
+        this.containerMinX = -this.containerWidth / 2;  // -148.5
+        this.containerMinY = -this.containerHeight / 2; // -148.5
 
         // Подписки на события от HitTest
         this.dispatcher.on('startDraft', this._onStartDraft.bind(this));
         this.dispatcher.on('moveDraft', this._onMoveDraft.bind(this));
         this.dispatcher.on('endDraft', this._onEndDraft.bind(this));
-        this.dispatcher.on('cancelDraft', this._onCancelDraft.bind(this));
+        // Принимаем приказ от HitTest (отмена жеста)
+        this.dispatcher.on('draftCancelled', this._onCancelDraft.bind(this));
     }
 
-    // Перевод миллиметров (от центра контейнера) в пиксели канваса (от левого верхнего угла)
+    // Перевод миллиметров (от центра контейнера) в пиксели канваса
+    // Ноль пикселей — левый верхний угол контейнера
     _toCanvasCoords(worldX, worldY) {
-        if (!this.visibleArea) return { x: worldX, y: worldY };
-
         const canvasWidth = this.mainCanvas.canvas.width / (window.devicePixelRatio || 1);
         const canvasHeight = this.mainCanvas.canvas.height / (window.devicePixelRatio || 1);
-        const va = this.visibleArea;
 
-        // Линейное отображение: прямоугольник visibleArea -> весь холст
-        const screenX = (worldX - va.minX) / (va.maxX - va.minX) * canvasWidth;
-        const screenY = (worldY - va.minY) / (va.maxY - va.minY) * canvasHeight;
+        const screenX = (worldX - this.containerMinX) / this.containerWidth * canvasWidth;
+        const screenY = (worldY - this.containerMinY) / this.containerHeight * canvasHeight;
 
         return { x: screenX, y: screenY };
     }
 
     _onStartDraft(data) {
-        if (!this._planeReady) return;
-        const { point } = data;
-        const px = this._toCanvasCoords(point.x, point.y);
-        this.overlay.clear();
-        this.overlay.drawPoint(px.x, px.y);
+        if (!data || !data.point) return;
+        const px = this._toCanvasCoords(data.point.x, data.point.y);
+        const request = { x: px.x, y: px.y };
+        this.dispatcher.emit('overlay:drawStartPoint', request);
     }
 
     _onMoveDraft(data) {
-        if (!this._planeReady) return;
-        const { startX, startY, currentX, currentY } = data;
-        const p1 = this._toCanvasCoords(startX, startY);
-        const p2 = this._toCanvasCoords(currentX, currentY);
-        this.overlay.clear();
-        this.overlay.drawPoint(p1.x, p1.y);
-        this.overlay.drawDashedLine(p1.x, p1.y, p2.x, p2.y);
+        if (!data) return;
+        const p1 = this._toCanvasCoords(data.startX, data.startY);
+        const p2 = this._toCanvasCoords(data.currentX, data.currentY);
+        const request = { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y };
+        this.dispatcher.emit('overlay:drawDashedLine', request);
     }
 
     _onEndDraft(data) {
-        if (!this._planeReady) return;
-        const { startX, startY, endX, endY } = data;
-        const p1 = this._toCanvasCoords(startX, startY);
-        const p2 = this._toCanvasCoords(endX, endY);
+        if (!data) return;
+        const p1 = this._toCanvasCoords(data.startX, data.startY);
+        const p2 = this._toCanvasCoords(data.endX, data.endY);
 
-        this.mainCanvas.drawLine(p1.x, p1.y, p2.x, p2.y);
-        this.mainCanvas.drawPoint(p1.x, p1.y);
-        this.mainCanvas.drawPoint(p2.x, p2.y);
+        // 1. Финальная линия на Overlay
+        const drawRequest = { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y };
+        this.dispatcher.emit('overlay:draftEndLine', drawRequest);
 
-        this.overlay.clear();
+        // 2. Очистка Overlay
+        this.dispatcher.emit('overlay:clear', {});
+
+        // 3. Фиксация на MainCanvas
+        const wallRequest = { x1: p1.x, y1: p1.y, x2: p2.x, y2: p2.y };
+        this.dispatcher.emit('mainCanvas:drawWall', wallRequest);
     }
 
-    _onCancelDraft() {
-        this.overlay.clear();
+    _onCancelDraft(data) {
+        // Отправляем финальную команду на очистку Overlay
+        this.dispatcher.emit('overlay:clear', {});
     }
 }
 

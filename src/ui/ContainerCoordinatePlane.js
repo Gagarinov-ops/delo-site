@@ -7,23 +7,18 @@ export class ContainerCoordinatePlane {
         this.halfHeight = height / 2;
         this.dispatcher = dispatcher;
 
-        // Размеры экрана в пикселях
         this.screenWidth = window.innerWidth;
         this.screenHeight = window.innerHeight;
         this.originX = this.screenWidth / 2;
         this.originY = this.screenHeight / 2;
 
-        // Видимая область от Viewport в миллиметрах
         this.viewportVisibleArea = null;
-
-        // Состояние жеста
         this._startX = 0;
         this._startY = 0;
 
         this._handleResize = this._handleResize.bind(this);
         this._setupResizeListener();
 
-        // Подписка на событие от Viewport
         if (this.dispatcher) {
             this.dispatcher.on('planeUpdated', this._onPlaneUpdated.bind(this));
         }
@@ -44,36 +39,30 @@ export class ContainerCoordinatePlane {
     _onPlaneUpdated(data) {
         if (data && data.visibleArea) {
             this.viewportVisibleArea = data.visibleArea;
+            if (this.dispatcher) {
+                this.dispatcher.emit('containerPlaneUpdated', {
+                    visibleArea: data.visibleArea
+                });
+            }
         }
     }
 
-    getOrigin() {
-        return { x: this.originX, y: this.originY };
-    }
-
-    getSize() {
-        return { width: this.width, height: this.height };
-    }
+    getOrigin() { return { x: this.originX, y: this.originY }; }
+    getSize() { return { width: this.width, height: this.height }; }
 
     getState() {
         return {
             origin: { x: 0, y: 0 },
             visibleArea: {
-                minX: -this.halfWidth,
-                maxX: this.halfWidth,
-                minY: -this.halfHeight,
-                maxY: this.halfHeight
+                minX: -this.halfWidth, maxX: this.halfWidth,
+                minY: -this.halfHeight, maxY: this.halfHeight
             }
         };
     }
 
     screenToWorld(screenX, screenY) {
         if (!this.viewportVisibleArea) {
-            // Временный fallback, пока Viewport не прислал данные
-            return {
-                x: screenX - this.originX,
-                y: screenY - this.originY
-            };
+            return { x: screenX - this.originX, y: screenY - this.originY };
         }
         const va = this.viewportVisibleArea;
         const worldX = va.minX + (screenX / this.screenWidth) * (va.maxX - va.minX);
@@ -82,42 +71,53 @@ export class ContainerCoordinatePlane {
     }
 
     handleToolGesture(data) {
-        if (!data || !this.dispatcher) return;
-
         const { gesture, screenX, screenY } = data;
         const world = this.screenToWorld(screenX, screenY);
 
-        // Проверяем, попадает ли точка в пределы контейнера
-        if (!this.isInside(world.x, world.y)) return;
-
-        const toolResult = {};
-
-        switch (gesture) {
-            case 'pointerdown':
-                this._startX = world.x;
-                this._startY = world.y;
-                toolResult.startX = world.x;
-                toolResult.startY = world.y;
-                break;
-            case 'pointermove':
-                toolResult.startX = this._startX;
-                toolResult.startY = this._startY;
-                toolResult.currentX = world.x;
-                toolResult.currentY = world.y;
-                break;
-            case 'pointerup':
-                toolResult.startX = this._startX;
-                toolResult.startY = this._startY;
-                toolResult.endX = world.x;
-                toolResult.endY = world.y;
-                break;
+        if (gesture === 'pointerdown') {
+            if (!this.isInside(world.x, world.y)) return;
+            this._startX = world.x;
+            this._startY = world.y;
+            this.dispatcher.emit('toolResult', {
+                gesture,
+                toolResult: { startX: world.x, startY: world.y },
+                visibleArea: this.viewportVisibleArea
+            });
+            return;
         }
 
-        this.dispatcher.emit('toolResult', {
-            gesture,
-            toolResult,
-            visibleArea: this.viewportVisibleArea
-        });
+        if (gesture === 'pointermove') {
+            // Выход за границу — отмена!
+            if (!this.isInside(world.x, world.y)) {
+                this.dispatcher.emit('cancelDraft');
+                return;
+            }
+            this.dispatcher.emit('toolResult', {
+                gesture,
+                toolResult: {
+                    startX: this._startX, startY: this._startY,
+                    currentX: world.x, currentY: world.y
+                },
+                visibleArea: this.viewportVisibleArea
+            });
+            return;
+        }
+
+        if (gesture === 'pointerup') {
+            // Финиш за границей — тоже отмена
+            if (!this.isInside(world.x, world.y)) {
+                this.dispatcher.emit('cancelDraft');
+                return;
+            }
+            this.dispatcher.emit('toolResult', {
+                gesture,
+                toolResult: {
+                    startX: this._startX, startY: this._startY,
+                    endX: world.x, endY: world.y
+                },
+                visibleArea: this.viewportVisibleArea
+            });
+        }
     }
 
     getGrid() {

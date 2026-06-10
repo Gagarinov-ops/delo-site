@@ -44,12 +44,16 @@ export function setupCanvasContainer(dispatcher) {
 
     // Данные (теперь создаём экземпляр класса)
     const canvasDataCopy = new CanvasDataCopy(dispatcher);
+    
+    // --- ВРЕМЕННАЯ ОТЛАДОЧНАЯ СТРОКА ---
+    window.canvasDataCopy = canvasDataCopy; // Чтобы видеть объект в консоли браузера
+    // ---------------------------------
 
     // Валидация и обработка инструментов
     const duplicateValidator = new DuplicateValidator(canvasDataCopy);
     const hitTest = new HitTest(dispatcher, canvasDataCopy, duplicateValidator);
 
-    // Управление слоями (теперь LayerManager получает dispatcher)
+    // Управление слоями
     const layerManager = new LayerManager(mainCanvas, overlay, dispatcher);
 
     dispatcher.emit('canvasDefined', canvasData);
